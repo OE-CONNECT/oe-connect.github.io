@@ -60,6 +60,12 @@ a:focus-visible {
   border-bottom-color: #1A3A6E;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* ========== NAVBAR ========== */
 .main-nav {
   position: fixed;
