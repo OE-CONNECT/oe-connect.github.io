@@ -59,11 +59,12 @@ footer {
 }
 
 /* ========== NAVBAR ========== */
+
 .main-nav {
-  background-color: #8B1A1A; 
-  padding: 0.8rem 0;
+  background-color: #53688B;
+  padding: 0.9rem 0;
   margin-bottom: 2rem;
-  border-bottom: 3px solid #5A0F0F;
+  border-bottom: 3px solid #3A4A66;
 }
 
 .nav-container {
@@ -78,15 +79,18 @@ footer {
 }
 
 .nav-logo {
-  color: #D4AF37;
+  color: #D4AF37; /* gold */
+  -webkit-text-stroke: 1.2px #8B1A1A; /* cloisonné red outline */
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
   letter-spacing: 1px;
+  transition: all 0.2s ease;
 }
 
 .nav-logo:hover {
-  color: #1A3A6E;
+  color: #8B1A1A; /* cloisonné red */
+  -webkit-text-stroke: 1.2px #D4AF37; /* gold outline */
 }
 
 .nav-links {
@@ -98,16 +102,16 @@ footer {
 }
 
 .nav-links a {
-  color: #D4AF37; 
+  color: #D4AF37; /* gold */
+  -webkit-text-stroke: 1px #8B1A1A; /* cloisonné red outline */
   text-decoration: none;
   font-size: 1.15rem;
-  border-bottom: 2px solid transparent;
-  transition: color 0.2s ease, border-bottom 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .nav-links a:hover {
-  color: #1A3A6E; /* dark blue */
-  border-bottom: 2px solid #1A3A6E;
+  color: #8B1A1A; /* cloisonné red */
+  -webkit-text-stroke: 1px #D4AF37; /* gold outline */
 }
 
 /* ========== FOOTER ========== */
