@@ -11,7 +11,7 @@ body {
   background-color: #F5E8C7;
   color: #2C1A0E;
   line-height: 1.6;
-  padding: 92px 20px 20px;
+  padding: 100px 20px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -69,7 +69,7 @@ footer {
 .main-nav .container-fluid {
   width: 100%;
   max-width: 1160px;
-  padding: 0 20px;
+  padding: 0 5px;
 }
 
 .navbar-brand {
@@ -81,8 +81,7 @@ footer {
 .logo {
   display: block;
   width: auto;
-  height: 80px;
-  max-width: min(220px, 60vw);
+  height: 100px;
   object-fit: contain;
 }
 
