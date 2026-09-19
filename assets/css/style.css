@@ -61,7 +61,7 @@ footer {
 /* ========== NAVBAR ========== */
 
 .main-nav {
-  background-color: #53688B;
+  background-color: #8B1A1A;
   padding: 0.9rem 0;
   margin-bottom: 2rem;
   border-bottom: 3px solid #3A4A66;
@@ -79,8 +79,8 @@ footer {
 }
 
 .nav-logo {
-  color: #D4AF37; /* gold */
-  -webkit-text-stroke: 1.2px #8B1A1A; /* cloisonné red outline */
+  color: #F5E8C7
+  -webkit-text-stroke: 0.2px #D4AF37; 
   font-size: 1.5rem;
   font-weight: bold;
   text-decoration: none;
@@ -89,8 +89,8 @@ footer {
 }
 
 .nav-logo:hover {
-  color: #8B1A1A; /* cloisonné red */
-  -webkit-text-stroke: 1.2px #D4AF37; /* gold outline */
+  color: #1A3A6E;
+  -webkit-text-stroke: 0.2px #D4AF37; /* gold outline */
 }
 
 .nav-links {
@@ -102,15 +102,15 @@ footer {
 }
 
 .nav-links a {
-  color: #D4AF37; /* gold */
-  -webkit-text-stroke: 1px #8B1A1A; /* cloisonné red outline */
+  color: #F5E8C7; 
+  -webkit-text-stroke: 0.2px #D4AF37; 
   text-decoration: none;
   font-size: 1.15rem;
   transition: all 0.2s ease;
 }
 
 .nav-links a:hover {
-  color: #8B1A1A; /* cloisonné red */
+  color: #1A3A6E;
   -webkit-text-stroke: 1px #D4AF37; /* gold outline */
 }
 
