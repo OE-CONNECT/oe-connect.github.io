@@ -9,9 +9,9 @@
 body {
   font-family: 'IM Fell English', 'Times New Roman', Times, serif;
   background-color: #F5E8C7;
-  color: #2C1A0E; 
+  color: #2C1A0E;
   line-height: 1.6;
-  padding: 20px;
+  padding: 92px 20px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -45,9 +45,10 @@ a {
   transition: color 0.2s ease, border-bottom 0.2s ease;
 }
 
-a:hover {
+a:hover,
+a:focus-visible {
   color: #1A3A6E;
-  border-bottom: 1px solid #1A3A6E;
+  border-bottom-color: #1A3A6E;
 }
 
 footer {
@@ -59,59 +60,60 @@ footer {
 }
 
 /* ========== NAVBAR ========== */
-
 .main-nav {
   background-color: #8B1A1A;
-  padding: 0.9rem 0;
-  margin-bottom: 2rem;
   border-bottom: 3px solid #3A4A66;
+  padding: 0.65rem 0;
 }
 
-.nav-container {
-  max-width: 900px;
-  margin: 0 auto;
+.main-nav .container-fluid {
+  width: 100%;
+  max-width: 1160px;
   padding: 0 20px;
+}
+
+.navbar-brand {
+  border-bottom: 0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
-.nav-logo {
+.logo {
+  display: block;
+  width: auto;
+  height: 56px;
+  max-width: min(220px, 60vw);
+  object-fit: contain;
+}
+
+.main-nav .navbar-toggler {
+  border-color: rgba(245, 232, 199, 0.7);
+}
+
+.main-nav .navbar-toggler:focus {
+  box-shadow: 0 0 0 0.2rem rgba(212, 175, 55, 0.45);
+}
+
+.main-nav .navbar-toggler-icon {
+  filter: brightness(0) invert(1);
+}
+
+.main-nav .navbar-nav {
+  gap: 0.35rem;
+}
+
+.main-nav .nav-link {
   color: #F5E8C7;
-  -webkit-text-stroke: 0.2px #D4AF37; 
-  font-size: 1.5rem;
-  font-weight: bold;
-  text-decoration: none;
-  letter-spacing: 1px;
-  transition: all 0.2s ease;
-}
-
-.nav-logo:hover {
-  color: #1A3A6E;
-  -webkit-text-stroke: 0.2px #D4AF37; /* gold outline */
-}
-
-.nav-links {
-  list-style: none;
-  display: flex;
-  gap: 1.8rem;
-  margin: 0;
-  padding: 0;
-}
-
-.nav-links a {
-  color: #F5E8C7; 
-  -webkit-text-stroke: 0.2px #D4AF37; 
-  text-decoration: none;
+  border-bottom: 2px solid transparent;
   font-size: 1.15rem;
-  transition: all 0.2s ease;
+  padding: 0.5rem 0.8rem;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease;
 }
 
-.nav-links a:hover {
-  color: #1A3A6E;
-  -webkit-text-stroke: 1px #D4AF37; /* gold outline */
+.main-nav .nav-link:hover,
+.main-nav .nav-link:focus-visible {
+  color: #D4AF37;
+  border-bottom-color: #D4AF37;
 }
 
 /* ========== FOOTER ========== */
@@ -132,4 +134,24 @@ footer {
   font-style: italic;
   font-size: 0.95rem;
   opacity: 0.9;
+}
+
+@media (max-width: 991.98px) {
+  .main-nav .navbar-nav {
+    padding-top: 0.75rem;
+  }
+
+  .main-nav .nav-link {
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 575.98px) {
+  body {
+    padding-top: 84px;
+  }
+
+  .logo {
+    height: 48px;
+  }
 }
