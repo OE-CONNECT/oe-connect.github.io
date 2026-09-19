@@ -11,7 +11,7 @@ body {
   background-color: #F5E8C7;
   color: #2C1A0E;
   line-height: 1.6;
-  padding: 100px 20px 20px;
+  padding: 200px 20px 20px;
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -63,7 +63,7 @@ footer {
 .main-nav {
   background-color: #8B1A1A;
   border-bottom: 3px solid #3A4A66;
-  padding: 0.65rem 0;
+  padding: 0.4 rem 0;
 }
 
 .main-nav .container-fluid {
@@ -147,10 +147,10 @@ footer {
 
 @media (max-width: 575.98px) {
   body {
-    padding-top: 84px;
+    padding-top: 200px;
   }
 
   .logo {
-    height: 48px;
+    height: 100px;
   }
 }
