@@ -57,3 +57,75 @@ footer {
   font-size: 0.95rem;
   color: #5A4030;
 }
+
+/* ========== NAVBAR ========== */
+.main-nav {
+  background-color: #8B1A1A; 
+  padding: 0.8rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid #5A0F0F;
+}
+
+.nav-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.nav-logo {
+  color: #D4AF37;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+
+.nav-logo:hover {
+  color: #1A3A6E;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.8rem;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: #D4AF37; 
+  text-decoration: none;
+  font-size: 1.15rem;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-bottom 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: #1A3A6E; /* dark blue */
+  border-bottom: 2px solid #1A3A6E;
+}
+
+/* ========== FOOTER ========== */
+.main-footer {
+  margin-top: 4rem;
+  padding: 1.8rem 20px;
+  background-color: #8B1A1A;
+  color: #F5E8C7;
+  text-align: center;
+  border-top: 3px solid #5A0F0F;
+}
+
+.footer-content p {
+  margin: 0.3rem 0;
+}
+
+.footer-subtitle {
+  font-style: italic;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
