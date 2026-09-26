@@ -222,6 +222,32 @@
     });
     document.getElementById('searchBox').addEventListener('input', renderEvents);
 
+    // Helper function to parse DD/M/YYYY format and return a Date object
+    function parseChronodate(dateStr) {
+      if (!dateStr) return null;
+      const parts = dateStr.split('/');
+      if (parts.length !== 3) return null;
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10);
+      const year = parseInt(parts[2], 10);
+      return new Date(year, month - 1, day);
+    }
+
+    // Helper function to sort events by Chronodate (most recent first)
+    function sortByChronodate(events) {
+      return events.sort((a, b) => {
+        const dateA = parseChronodate(a.Chronodate);
+        const dateB = parseChronodate(b.Chronodate);
+        
+        // Handle missing dates - put them at the end
+        if (!dateA) return 1;
+        if (!dateB) return -1;
+        
+        // Sort descending (most recent first)
+        return dateB - dateA;
+      });
+    }
+
     function renderEvents() {
       const statusFilter = document.querySelector('input[name="status"]:checked').value;
       const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
@@ -240,10 +266,10 @@
       const upcomingEvents = filtered.filter(e => e.Status === 'upcoming');
       const pastEvents = filtered.filter(e => e.Status === 'past');
 
-      const oeUpcoming = upcomingEvents.filter(e => e.Group === 'OE-CONNECT');
-      const otherUpcoming = upcomingEvents.filter(e => e.Group === 'Other');
-      const oePast = pastEvents.filter(e => e.Group === 'OE-CONNECT');
-      const otherPast = pastEvents.filter(e => e.Group === 'Other');
+      const oeUpcoming = sortByChronodate(upcomingEvents.filter(e => e.Group === 'OE-CONNECT'));
+      const otherUpcoming = sortByChronodate(upcomingEvents.filter(e => e.Group === 'Other'));
+      const oePast = sortByChronodate(pastEvents.filter(e => e.Group === 'OE-CONNECT'));
+      const otherPast = sortByChronodate(pastEvents.filter(e => e.Group === 'Other'));
 
       let html = '';
 
