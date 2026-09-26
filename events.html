@@ -195,7 +195,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
-    const CSV_URL = 'assets/data/events.csv';
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkYM8BFpPiqinOeZJchhw4evXCPQGpp-vNO0cdlO28KcKwDaKnEwUgemcP-EwhYnc8FrROyw8BOtss/pub?gid=646996331&single=true&output=csv';
     let allEvents = [];
 
     // Load CSV
@@ -247,7 +247,7 @@
 
       let html = '';
 
-      html += `<h1 class="status-heading">Upcoming events [${upcomingEvents.length}]</h1>`;
+      html += `<h1 class="status-heading">Upcoming events (${upcomingEvents.length})</h1>`;
       html += `<h2 class="group-heading">OE-CONNECT events</h2>`;
       if (oeUpcoming.length === 0) {
         html += '<p>No matching OE-CONNECT upcoming events.</p>';
@@ -262,7 +262,7 @@
         otherUpcoming.forEach(ev => html += renderCard(ev));
       }
 
-      html += `<h1 class="status-heading">Past events [${pastEvents.length}]</h1>`;
+      html += `<h1 class="status-heading">Past events (${pastEvents.length})</h1>`;
       html += `<h2 class="group-heading">OE-CONNECT events</h2>`;
       if (oePast.length === 0) {
         html += '<p>No matching OE-CONNECT past events.</p>';
