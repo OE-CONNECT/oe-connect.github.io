@@ -266,6 +266,9 @@
       const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
 
       let filtered = allEvents.filter(ev => {
+        // Only include approved events
+        if (ev.APPROVED !== 'TRUE') return false;
+        
         if (statusFilter !== 'all' && ev.Status !== statusFilter) return false;
         if (ev.Format && !activeFormats.includes(ev.Format)) return false;
         if (searchTerm) {
