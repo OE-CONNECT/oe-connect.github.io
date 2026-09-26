@@ -107,12 +107,22 @@
       margin-right: 1rem;
     }
 
-    .group-heading {
+    .status-heading {
       margin-top: 2.5rem;
-      margin-bottom: 1.2rem;
-      padding-bottom: 0.4rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.6rem;
       border-bottom: 2px solid #8B1A1A;
       color: #8B1A1A;
+      font-size: 2rem;
+    }
+
+    .group-heading {
+      margin-top: 1.8rem;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px solid #d4c4a8;
+      color: #2C1A0E;
+      font-size: 1.25rem;
     }
 
     @media (max-width: 800px) {
@@ -227,31 +237,44 @@
         return true;
       });
 
-      // Group
-      const oeEvents = filtered.filter(e => e.Group === 'OE-CONNECT');
-      const otherEvents = filtered.filter(e => e.Group === 'Other');
+      const upcomingEvents = filtered.filter(e => e.Status === 'upcoming');
+      const pastEvents = filtered.filter(e => e.Status === 'past');
 
-      const oeUpcoming = oeEvents.filter(e => e.Status === 'upcoming').length;
-      const oePast = oeEvents.filter(e => e.Status === 'past').length;
-      const otherUpcoming = otherEvents.filter(e => e.Status === 'upcoming').length;
-      const otherPast = otherEvents.filter(e => e.Status === 'past').length;
+      const oeUpcoming = upcomingEvents.filter(e => e.Group === 'OE-CONNECT');
+      const otherUpcoming = upcomingEvents.filter(e => e.Group === 'Other');
+      const oePast = pastEvents.filter(e => e.Group === 'OE-CONNECT');
+      const otherPast = pastEvents.filter(e => e.Group === 'Other');
 
       let html = '';
 
-      // OE-CONNECT section
-      html += `<h2 class="group-heading">OE-CONNECT events (${oeUpcoming} upcoming event${oeUpcoming !== 1 ? 's' : ''}; ${oePast} past event${oePast !== 1 ? 's' : ''})</h2>`;
-      if (oeEvents.length === 0) {
-        html += '<p>No matching OE-CONNECT events.</p>';
+      html += `<h1 class="status-heading">Upcoming events [${upcomingEvents.length}]</h1>`;
+      html += `<h2 class="group-heading">OE-CONNECT events</h2>`;
+      if (oeUpcoming.length === 0) {
+        html += '<p>No matching OE-CONNECT upcoming events.</p>';
       } else {
-        oeEvents.forEach(ev => html += renderCard(ev));
+        oeUpcoming.forEach(ev => html += renderCard(ev));
       }
 
-      // Other section
-      html += `<h2 class="group-heading">Other Old English events (${otherUpcoming} upcoming event${otherUpcoming !== 1 ? 's' : ''}; ${otherPast} past event${otherPast !== 1 ? 's' : ''})</h2>`;
-      if (otherEvents.length === 0) {
-        html += '<p>No matching other events.</p>';
+      html += `<h2 class="group-heading">Other Old English events</h2>`;
+      if (otherUpcoming.length === 0) {
+        html += '<p>No matching other upcoming events.</p>';
       } else {
-        otherEvents.forEach(ev => html += renderCard(ev));
+        otherUpcoming.forEach(ev => html += renderCard(ev));
+      }
+
+      html += `<h1 class="status-heading">Past events [${pastEvents.length}]</h1>`;
+      html += `<h2 class="group-heading">OE-CONNECT events</h2>`;
+      if (oePast.length === 0) {
+        html += '<p>No matching OE-CONNECT past events.</p>';
+      } else {
+        oePast.forEach(ev => html += renderCard(ev));
+      }
+
+      html += `<h2 class="group-heading">Other Old English events</h2>`;
+      if (otherPast.length === 0) {
+        html += '<p>No matching other past events.</p>';
+      } else {
+        otherPast.forEach(ev => html += renderCard(ev));
       }
 
       document.getElementById('eventsContainer').innerHTML = html;
