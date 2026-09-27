@@ -178,13 +178,7 @@
 
       <!-- RIGHT: compact filters -->
       <aside class="events-sidebar">
-        <div class="filter-group">
-          <h3>Status</h3>
-          <label><input type="radio" name="status" value="all" checked> All</label>
-          <label><input type="radio" name="status" value="upcoming"> Upcoming</label>
-          <label><input type="radio" name="status" value="past"> Past</label>
-        </div>
-
+        
         <div class="filter-group">
           <h3>Format</h3>
           <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
@@ -192,10 +186,7 @@
           <label><input type="checkbox" class="format-filter" value="Hybrid" checked> Hybrid</label>
         </div>
 
-        <div class="filter-group">
-          <h3>Search</h3>
-          <input type="text" id="searchBox" placeholder="Search events…">
-        </div>
+
       </aside>
     </div>
   </main>
@@ -226,13 +217,9 @@
     });
 
     // Filters
-    document.querySelectorAll('input[name="status"]').forEach(el => {
-      el.addEventListener('change', renderEvents);
-    });
     document.querySelectorAll('.format-filter').forEach(el => {
       el.addEventListener('change', renderEvents);
     });
-    document.getElementById('searchBox').addEventListener('input', renderEvents);
 
     // Helper function to parse DD/M/YYYY format and return a Date object
     function parseChronodate(dateStr) {
