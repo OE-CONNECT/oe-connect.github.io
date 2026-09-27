@@ -19,12 +19,10 @@
     </header>
 
     <div class="events-layout">
-      <!-- LEFT: list of events -->
       <div class="events-main" id="eventsContainer">
         <p>Loading events…</p>
       </div>
 
-      <!-- RIGHT: compact filters -->
       <aside class="events-sidebar">
         <div class="filter-group">
           <h3>Format</h3>
@@ -66,13 +64,11 @@
       }
     });
 
-    // Format and country filters both re-render the same event list.
     document.querySelectorAll('.format-filter').forEach(el => {
       el.addEventListener('change', renderEvents);
     });
 
     function getCountry(ev) {
-      // Support both the current CSV header and the lower-camel-case name.
       return (ev.LocationCountry || ev.locationCountry || '').trim();
     }
 
@@ -94,7 +90,6 @@
       });
     }
 
-    // Parse DD/M/YYYY and return a Date object for sorting.
     function parseChronodate(dateStr) {
       if (!dateStr) return null;
       const parts = dateStr.split('/');
@@ -120,8 +115,6 @@
       const activeCountries = Array.from(document.querySelectorAll('.country-filter:checked')).map(cb => cb.value);
 
       const filtered = allEvents.filter(ev => {
-        // Status is still used internally to separate upcoming and past events;
-        // it is no longer exposed as a user-facing filter.
         if (ev.APPROVED !== 'TRUE') return false;
         if (ev.Format && !activeFormats.includes(ev.Format)) return false;
         const country = getCountry(ev);
