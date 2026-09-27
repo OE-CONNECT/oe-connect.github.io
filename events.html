@@ -50,14 +50,6 @@
       cursor: pointer;
     }
 
-    #searchBox {
-      width: 100%;
-      padding: 0.4rem;
-      border: 1px solid #8B1A1A;
-      background: #F5E8C7;
-      font-family: inherit;
-    }
-
     /* Event card */
     .event-card {
       display: flex;
@@ -170,7 +162,7 @@
       <p>Here is an overview of Old English events (conferences; summer schools; exhibitions, etc.) relating to Old English at European continental institutions.</p>
     </header>
 
- <div class="events-layout">
+    <div class="events-layout">
       <!-- LEFT: list of events -->
       <div class="events-main" id="eventsContainer">
         <p>Loading events…</p>
@@ -178,7 +170,6 @@
 
       <!-- RIGHT: compact filters -->
       <aside class="events-sidebar">
-        
         <div class="filter-group">
           <h3>Format</h3>
           <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
@@ -186,7 +177,10 @@
           <label><input type="checkbox" class="format-filter" value="Hybrid" checked> Hybrid</label>
         </div>
 
-
+        <div class="filter-group">
+          <h3>Country</h3>
+          <div id="countryFilters"><p>Loading countries…</p></div>
+        </div>
       </aside>
     </div>
   </main>
@@ -201,13 +195,13 @@
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTkYM8BFpPiqinOeZJchhw4evXCPQGpp-vNO0cdlO28KcKwDaKnEwUgemcP-EwhYnc8FrROyw8BOtss/pub?gid=646996331&single=true&output=csv';
     let allEvents = [];
 
-    // Load CSV
     Papa.parse(CSV_URL, {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
         allEvents = results.data;
+        renderCountryFilters();
         renderEvents();
       },
       error: function(err) {
@@ -216,12 +210,35 @@
       }
     });
 
-    // Filters
+    // Format and country filters both re-render the same event list.
     document.querySelectorAll('.format-filter').forEach(el => {
       el.addEventListener('change', renderEvents);
     });
 
-    // Helper function to parse DD/M/YYYY format and return a Date object
+    function getCountry(ev) {
+      // Support both the current CSV header and the lower-camel-case name.
+      return (ev.LocationCountry || ev.locationCountry || '').trim();
+    }
+
+    function renderCountryFilters() {
+      const countries = [...new Set(allEvents.map(getCountry).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+      const container = document.getElementById('countryFilters');
+
+      if (!countries.length) {
+        container.innerHTML = '<p>No countries available.</p>';
+        return;
+      }
+
+      container.innerHTML = countries.map(country => `
+        <label><input type="checkbox" class="country-filter" value="${country}" checked> ${country}</label>
+      `).join('');
+
+      container.querySelectorAll('.country-filter').forEach(el => {
+        el.addEventListener('change', renderEvents);
+      });
+    }
+
+    // Parse DD/M/YYYY and return a Date object for sorting.
     function parseChronodate(dateStr) {
       if (!dateStr) return null;
       const parts = dateStr.split('/');
@@ -232,92 +249,58 @@
       return new Date(year, month - 1, day);
     }
 
-    // Helper function to sort events by Chronodate (most recent first)
     function sortByChronodate(events) {
       return events.sort((a, b) => {
         const dateA = parseChronodate(a.Chronodate);
         const dateB = parseChronodate(b.Chronodate);
-        
-        // Handle missing dates - put them at the end
         if (!dateA) return 1;
         if (!dateB) return -1;
-        
-        // Sort descending (most recent first)
         return dateB - dateA;
       });
     }
 
     function renderEvents() {
-      const statusFilter = document.querySelector('input[name="status"]:checked').value;
       const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
-      const searchTerm = document.getElementById('searchBox').value.toLowerCase().trim();
+      const activeCountries = Array.from(document.querySelectorAll('.country-filter:checked')).map(cb => cb.value);
 
-      let filtered = allEvents.filter(ev => {
-        // Only include approved events
+      const filtered = allEvents.filter(ev => {
+        // Status is still used internally to separate upcoming and past events;
+        // it is no longer exposed as a user-facing filter.
         if (ev.APPROVED !== 'TRUE') return false;
-        
-        if (statusFilter !== 'all' && ev.Status !== statusFilter) return false;
         if (ev.Format && !activeFormats.includes(ev.Format)) return false;
-        if (searchTerm) {
-          const text = (ev.Name + ' ' + ev.Description).toLowerCase();
-          if (!text.includes(searchTerm)) return false;
-        }
+        const country = getCountry(ev);
+        if (country && !activeCountries.includes(country)) return false;
         return true;
       });
 
       const upcomingEvents = filtered.filter(e => e.Status === 'upcoming');
       const pastEvents = filtered.filter(e => e.Status === 'past');
-
       const oeUpcoming = sortByChronodate(upcomingEvents.filter(e => e.Group === 'OE-CONNECT'));
       const otherUpcoming = sortByChronodate(upcomingEvents.filter(e => e.Group === 'Other'));
       const oePast = sortByChronodate(pastEvents.filter(e => e.Group === 'OE-CONNECT'));
       const otherPast = sortByChronodate(pastEvents.filter(e => e.Group === 'Other'));
 
       let html = '';
-
       html += `<h1 class="status-heading">Upcoming events (${upcomingEvents.length})</h1>`;
       html += `<h2 class="group-heading" style="text-align: center;">OE-CONNECT events</h2>`;
-      if (oeUpcoming.length === 0) {
-        html += '<p>No matching OE-CONNECT upcoming events.</p>';
-      } else {
-        oeUpcoming.forEach(ev => html += renderCard(ev));
-      }
-
+      html += oeUpcoming.length ? oeUpcoming.map(renderCard).join('') : '<p>No matching OE-CONNECT upcoming events.</p>';
       html += `<h2 class="group-heading" style="text-align: center;">Other Old English events</h2>`;
-      if (otherUpcoming.length === 0) {
-        html += '<p>No matching other upcoming events.</p>';
-      } else {
-        otherUpcoming.forEach(ev => html += renderCard(ev));
-      }
-
+      html += otherUpcoming.length ? otherUpcoming.map(renderCard).join('') : '<p>No matching other upcoming events.</p>';
       html += `<h1 class="status-heading">Past events (${pastEvents.length})</h1>`;
       html += `<h2 class="group-heading" style="text-align: center;">OE-CONNECT events</h2>`;
-      if (oePast.length === 0) {
-        html += '<p>No matching OE-CONNECT past events.</p>';
-      } else {
-        oePast.forEach(ev => html += renderCard(ev));
-      }
-
+      html += oePast.length ? oePast.map(renderCard).join('') : '<p>No matching OE-CONNECT past events.</p>';
       html += `<h2 class="group-heading" style="text-align: center;">Other Old English events</h2>`;
-      if (otherPast.length === 0) {
-        html += '<p>No matching other past events.</p>';
-      } else {
-        otherPast.forEach(ev => html += renderCard(ev));
-      }
+      html += otherPast.length ? otherPast.map(renderCard).join('') : '<p>No matching other past events.</p>';
 
       document.getElementById('eventsContainer').innerHTML = html;
     }
 
     function renderCard(ev) {
-      const logoHtml = ev.Logo
-        ? `<img src="${ev.Logo}" alt="Logo" class="event-logo">`
-        : '';
-
+      const logoHtml = ev.Logo ? `<img src="${ev.Logo}" alt="Logo" class="event-logo">` : '';
       const links = [];
       if (ev.Website) links.push(`<a href="${ev.Website}" target="_blank">Website</a>`);
       if (ev.CFP) links.push(`<a href="${ev.CFP}" target="_blank">Call for Papers</a>`);
-
-      const location = [ev.LocationCity, ev.LocationCountry].filter(Boolean).join(', ');
+      const location = [ev.LocationCity, getCountry(ev)].filter(Boolean).join(', ');
 
       return `
         <div class="event-card">
