@@ -145,7 +145,7 @@
     }
 
     function renderCard(ev) {
-      const logoHtml = ev.Logo ? `<img src="${ev.Logo}" alt="Logo" class="event-logo">` : '';
+      const logoHtml = ev.Logo ? `<img src="${ev.Logo}" alt="Logo" class="event-logo" loading="lazy">` : '';
       const links = [];
       if (ev.Website) links.push(`<a href="${ev.Website}" target="_blank">Website</a>`);
       if (ev.CFP) links.push(`<a href="${ev.CFP}" target="_blank">Call for Papers</a>`);
@@ -156,7 +156,7 @@
           <div class="event-left">
             <div class="event-year">${ev.Year || ''}</div>
             <div class="event-date">${ev.Date || ''}</div>
-            ${logoHtml}
+            ${logoHtml ? `<img src="${ev.Logo}" alt="Logo" class="event-logo" loading="lazy">` : ''}
           </div>
           <div class="event-right">
             <h3>${ev.Name || 'Untitled event'}</h3>
