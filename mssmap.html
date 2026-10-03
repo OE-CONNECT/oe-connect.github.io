@@ -73,6 +73,12 @@
       border-radius: 4px;
     }
 
+    /* Results title */
+    #resultsTitle {
+      margin-bottom: 1.5rem;
+      color: #2C1A0E;
+    }
+
     /* Filter badges */
     .filter-badges {
       display: flex;
@@ -246,6 +252,9 @@
     <!-- Map -->
     <div id="map"></div>
 
+    <!-- Results title -->
+    <h2 id="resultsTitle"></h2>
+
     <!-- Filter badges -->
     <div class="filter-badges">
       <div id="countryFilterBadge" class="filter-badge">
@@ -343,9 +352,25 @@
     // ---------- Render list + map ----------
     function render() {
       const filtered = getFiltered();
+      updateResultsTitle(filtered);
       updateFilterBadges();
       renderCards(filtered);
       updateMap(filtered);
+    }
+
+    function updateResultsTitle(filtered) {
+      const manuscriptCount = filtered.filter(m => {
+        const type = (m['Fragment or full'] || '').trim();
+        return type === 'Full MS';
+      }).length;
+
+      const fragmentCount = filtered.filter(m => {
+        const type = (m['Fragment or full'] || '').trim();
+        return type === 'Fragment';
+      }).length;
+
+      const titleElement = document.getElementById('resultsTitle');
+      titleElement.textContent = `Showing ${manuscriptCount} manuscripts and ${fragmentCount} fragments`;
     }
 
     function updateFilterBadges() {
