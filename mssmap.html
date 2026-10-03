@@ -73,6 +73,43 @@
       border-radius: 4px;
     }
 
+    /* City filter badge and clear button */
+    #cityFilterBadge {
+      display: none;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+      padding: 0.8rem 1.2rem;
+      background: #D4AF37;
+      border: 1px solid #8B1A1A;
+      border-radius: 4px;
+    }
+
+    #cityFilterBadge.active {
+      display: flex;
+    }
+
+    #cityFilterBadge span {
+      color: #2C1A0E;
+      font-weight: bold;
+    }
+
+    #clearCityFilter {
+      padding: 0.4rem 0.8rem;
+      background: #8B1A1A;
+      color: #F5E8C7;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      text-decoration: none;
+    }
+
+    #clearCityFilter:hover {
+      background: #1A3A6E;
+      color: #F5E8C7;
+    }
+
     /* Manuscript card */
     .ms-card {
       display: flex;
@@ -158,6 +195,11 @@
         align-items: center;
         gap: 1rem;
       }
+
+      #cityFilterBadge {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -194,6 +236,12 @@
 
     <!-- Map -->
     <div id="map"></div>
+
+    <!-- City filter badge -->
+    <div id="cityFilterBadge">
+      <span>Filtering by city: <strong id="cityFilterName"></strong></span>
+      <button id="clearCityFilter">Clear filter</button>
+    </div>
 
     <!-- List of manuscript cards -->
     <div id="msContainer">
@@ -243,6 +291,7 @@
     document.getElementById('filterFull').addEventListener('change', render);
     document.getElementById('filterFragment').addEventListener('change', render);
     document.getElementById('filterCountry').addEventListener('change', render);
+    document.getElementById('clearCityFilter').addEventListener('click', clearCityFilter);
 
     function populateFilterOptions() {
       const countries = [...new Set(allManuscripts.map(m => m.Country).filter(Boolean))].sort();
@@ -280,8 +329,19 @@
     // ---------- Render list + map ----------
     function render() {
       const filtered = getFiltered();
+      updateCityFilterBadge();
       renderCards(filtered);
       updateMap(filtered);
+    }
+
+    function updateCityFilterBadge() {
+      const badge = document.getElementById('cityFilterBadge');
+      if (filterCity) {
+        badge.classList.add('active');
+        document.getElementById('cityFilterName').textContent = filterCity;
+      } else {
+        badge.classList.remove('active');
+      }
     }
 
     function renderCards(list) {
@@ -414,6 +474,11 @@
       document.getElementById('filterCountry').value = '';
       render();
     };
+
+    function clearCityFilter() {
+      filterCity = '';
+      render();
+    }
   </script>
 </body>
 </html>
