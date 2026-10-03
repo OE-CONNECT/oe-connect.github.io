@@ -463,61 +463,71 @@
       }, 100);
     }
 
-    function updateMap(list) {
-      markersLayer.clearLayers();
+  function updateMap(list) {
+  markersLayer.clearLayers();
 
-      const groups = {};
-      list.forEach(m => {
-        if (!m.latitude || !m.longitude || !m.City) return;
-        const key = m.City + '|' + (m.Country || '');
-        if (!groups[key]) {
-          groups[key] = {
-            city: m.City,
-            country: m.Country || '',
-            lat: parseFloat(m.latitude),
-            lng: parseFloat(m.longitude),
-            full: 0,
-            fragment: 0
-          };
-        }
-        const type = (m['Fragment or full'] || '').trim();
-        if (type === 'Full MS') groups[key].full++;
-        else if (type === 'Fragment') groups[key].fragment++;
-      });
-
-      Object.values(groups).forEach(g => {
-        const total = g.full + g.fragment;
-        let color;
-        if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';
-        else if (g.full > 0) color = '#D4AF37';
-        else color = '#1A3A6E';
-
-        const icon = L.divIcon({
-          className: 'custom-marker',
-          html: `<div style="
-            background:${color};
-            color:#F5E8C7;
-            width:28px;height:28px;
-            border-radius:50%;
-            display:flex;align-items:center;justify-content:center;
-            font-weight:bold;font-size:13px;
-            border:2px solid #F5E8C7;
-            box-shadow:0 1px 4px rgba(0,0,0,0.4);
-          ">${total}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
-        });
-
-        const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
-
-        let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
-        if (g.full > 0) popup += `Number of full manuscripts: ${g.full}<br>`;
-        if (g.fragment > 0) popup += `Number of fragments: ${g.fragment}<br>`;
-        popup += `<a class="popup-filter-btn" onclick="filterByCity('${g.city.replace(/'/g, "\\'")}')">Use location as filter</a>`;
-
-        marker.bindPopup(popup);
-      });
+  const groups = {};
+  list.forEach(m => {
+    if (!m.latitude || !m.longitude || !m.City) return;
+    const key = m.City + '|' + (m.Country || '');
+    if (!groups[key]) {
+      groups[key] = {
+        city: m.City,
+        country: m.Country || '',
+        lat: parseFloat(m.latitude),
+        lng: parseFloat(m.longitude),
+        full: 0,
+        fragment: 0
+      };
     }
+    const type = (m['Fragment or full'] || '').trim();
+    if (type === 'Full MS') groups[key].full++;
+    else if (type === 'Fragment') groups[key].fragment++;
+  });
+
+  Object.values(groups).forEach(g => {
+    const total = g.full + g.fragment;
+    let color;
+    if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';
+    else if (g.full > 0) color = '#D4AF37';
+    else color = '#1A3A6E';
+
+    const icon = L.divIcon({
+      className: 'custom-marker',
+      html: `<div style="
+        background:${color};
+        color:#F5E8C7;
+        width:28px;height:28px;
+        border-radius:50%;
+        display:flex;align-items:center;justify-content:center;
+        font-weight:bold;font-size:13px;
+        border:2px solid #F5E8C7;
+        box-shadow:0 1px 4px rgba(0,0,0,0.4);
+      ">${total}</div>`,
+      iconSize: [28, 28],
+      iconAnchor: [14, 14]
+    });
+
+    const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
+
+    let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
+    if (g.full > 0) popup += `Number of full manuscripts: ${g.full}<br>`;
+    if (g.fragment > 0) popup += `Number of fragments: ${g.fragment}<br>`;
+    popup += `<a class="popup-filter-btn" onclick="filterByCity('${g.city.replace(/'/g, "\\'")}')">Use location as filter</a>`;
+
+    marker.bindPopup(popup);
+  });
+
+  // Zoom the map to the selected country (or reset when "All countries")
+  const country = document.getElementById('filterCountry').value;
+
+  if (country && markersLayer.getLayers().length > 0) {
+    const group = L.featureGroup(markersLayer.getLayers());
+    map.fitBounds(group.getBounds().pad(0.25));
+  } else if (!country) {
+    map.setView([50.5, 10], 4);
+  }
+}
 
     window.filterByCity = function(cityName) {
       filterCity = cityName;
