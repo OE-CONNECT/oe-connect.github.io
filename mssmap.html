@@ -216,6 +216,27 @@
     const CSV_URL = 'assets/data/mss.csv';
     let allManuscripts = [];
     let map, markersLayer;
+    let navbarLoaded = false;
+
+    // Listen for navbar load completion
+    const navbarObserver = new MutationObserver(() => {
+      const nav = document.querySelector('.main-nav');
+      if (nav && !navbarLoaded) {
+        navbarLoaded = true;
+        navbarObserver.disconnect();
+        // Trigger initialization if CSV is also loaded
+        if (allManuscripts.length > 0) {
+          populateFilterOptions();
+          initMap();
+          render();
+        }
+      }
+    });
+
+    navbarObserver.observe(document.getElementById('navbar-placeholder'), {
+      childList: true,
+      subtree: true
+    });
 
     // ---------- Load data ----------
     Papa.parse(CSV_URL, {
@@ -227,9 +248,12 @@
           .filter(row => row['OE-CONNECT ID'])
           .sort((a, b) => parseInt(a['OE-CONNECT ID']) - parseInt(b['OE-CONNECT ID']));
 
-        populateFilterOptions();
-        initMap();
-        render();
+        // Only initialize if navbar is already loaded
+        if (navbarLoaded) {
+          populateFilterOptions();
+          initMap();
+          render();
+        }
       },
       error: function(err) {
         document.getElementById('msContainer').innerHTML = '<p>Could not load mss.csv</p>';
@@ -344,6 +368,7 @@
 
     // ---------- Leaflet map ----------
     function initMap() {
+      // Force a layout recalculation before initializing Leaflet
       map = L.map('map', {
         center: [50.5, 10],
         zoom: 4,
@@ -355,6 +380,9 @@
       }).addTo(map);
 
       markersLayer = L.layerGroup().addTo(map);
+
+      // Invalidate size after a short delay to account for DOM reflow
+      setTimeout(() => map.invalidateSize(), 300);
     }
 
     function updateMap(list) {
