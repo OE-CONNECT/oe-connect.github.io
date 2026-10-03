@@ -556,13 +556,24 @@ if (country && layers.length > 0) {
     }
 
     function cleanQuotes(text) {
-      if (text === null || text === undefined) return '';
-
-      return String(text)
-        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")
-        .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
-        .replace(/[\u00AB\u00BB]/g, '"')
-        .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015]/g, '-');
+      if (!text) return text;
+      
+      let result = String(text);
+      
+      // Curly double quotes: " " (U+201C, U+201D) and variants („, ‟)
+      result = result.replace(/[\u201C\u201D\u201E\u201F]/g, '"');
+      
+      // Curly single quotes: ' ' (U+2018, U+2019) and variants (‚, ‛)
+      result = result.replace(/[\u2018\u2019\u201A\u201B]/g, "'");
+      
+      // Guillemets and other quote marks
+      result = result.replace(/[\u00AB\u00BB\u2039\u203A]/g, '"');
+      
+      // Prime marks
+      result = result.replace(/[\u2032\u2033\u2034]/g, "'");
+      result = result.replace(/[\u2035\u2036\u2037]/g, '"');
+      
+      return result;
     }
   </script>
 </body>
