@@ -519,14 +519,22 @@
   });
 
   // Zoom the map to the selected country (or reset when "All countries")
-  const country = document.getElementById('filterCountry').value;
+const country = document.getElementById('filterCountry').value;
+const layers = markersLayer.getLayers();
 
-  if (country && markersLayer.getLayers().length > 0) {
-    const group = L.featureGroup(markersLayer.getLayers());
+if (country && layers.length > 0) {
+  if (layers.length === 1) {
+    // Only one city → use a comfortable fixed zoom
+    const latlng = layers[0].getLatLng();
+    map.setView(latlng, 8);          // 8 is a good level (you can try 7 or 9)
+  } else {
+    // Multiple cities → fit all of them
+    const group = L.featureGroup(layers);
     map.fitBounds(group.getBounds().pad(0.25));
-  } else if (!country) {
-    map.setView([50.5, 10], 4);
   }
+} else if (!country) {
+  map.setView([50.5, 10], 4);
+}
 }
 
     window.filterByCity = function(cityName) {
