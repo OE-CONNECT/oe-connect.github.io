@@ -554,10 +554,14 @@ if (country && layers.length > 0) {
     }
 
 function cleanQuotes(text) {
-  if (!text) return '';
+  if (!text) return text;
   return text
-    .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')  // double quotes
-    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'"); // single quotes
+    // All common double curly quotes → straight "
+    .replace(/[“”„‟❝❞＂]/g, '"')
+    // All common single curly quotes → straight '
+    .replace(/[‘’‚‛‹›＇]/g, "'")
+    // Just in case there are other quote-like characters
+    .replace(/[«»]/g, '"');
 }
   </script>
 </body>
