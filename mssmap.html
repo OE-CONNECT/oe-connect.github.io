@@ -432,7 +432,7 @@
             </div>
             <div class="ms-right">
               <h3>${m.SHELFMARK || 'Untitled'}</h3>
-              <p>${m['OE contents'] || ''}</p>
+              <p>${cleanQuotes(m['OE contents']) || ''}</p>
               ${digital}
               ${secondary.length ? `<div class="ms-links-secondary">${secondary.join(' · ')}</div>` : ''}
             </div>
@@ -552,6 +552,13 @@ if (country && layers.length > 0) {
       document.getElementById('filterCountry').value = '';
       render();
     }
+
+function cleanQuotes(text) {
+  if (!text) return '';
+  return text
+    .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')  // double quotes
+    .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'"); // single quotes
+}
   </script>
 </body>
 </html>
