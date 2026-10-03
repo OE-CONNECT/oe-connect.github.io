@@ -424,6 +424,8 @@
           secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF</a>`);
         }
 
+        const oeContents = cleanQuotes(m['OE contents'] || '');
+
         html += `
           <div class="ms-card">
             <div class="ms-left">
@@ -432,7 +434,7 @@
             </div>
             <div class="ms-right">
               <h3>${m.SHELFMARK || 'Untitled'}</h3>
-              <p>${cleanQuotes(m['OE contents']) || ''}</p>
+              <p>${oeContents}</p>
               ${digital}
               ${secondary.length ? `<div class="ms-links-secondary">${secondary.join(' · ')}</div>` : ''}
             </div>
@@ -553,16 +555,15 @@ if (country && layers.length > 0) {
       render();
     }
 
-function cleanQuotes(text) {
-  if (!text) return text;
-  return text
-    // All common double curly quotes → straight "
-    .replace(/[“”„‟❝❞＂]/g, '"')
-    // All common single curly quotes → straight '
-    .replace(/[‘’‚‛‹›＇]/g, "'")
-    // Just in case there are other quote-like characters
-    .replace(/[«»]/g, '"');
-}
+    function cleanQuotes(text) {
+      if (text === null || text === undefined) return '';
+
+      return String(text)
+        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'")
+        .replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
+        .replace(/[\u00AB\u00BB]/g, '"')
+        .replace(/[\u2010\u2011\u2012\u2013\u2014\u2015]/g, '-');
+    }
   </script>
 </body>
 </html>
