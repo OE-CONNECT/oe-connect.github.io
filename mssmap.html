@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manuscripts – OE-CONNECT</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    /* ===== Manuscripts page styles ===== */
+    .filters-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f8f1e3;
+      border: 1px solid #d4c4a8;
+      border-radius: 4px;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .filter-group label {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #8B1A1A;
+    }
+
+    .filters-bar select {
+      padding: 0.35rem 0.6rem;
+      border: 1px solid #8B1A1A;
+      background: #F5E8C7;
+      font-family: inherit;
+      min-width: 140px;
+    }
+
+    .type-toggles {
+      display: flex;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .type-toggles label {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+
+    #map {
+      height: 420px;
+      width: 100%;
+      margin-bottom: 2rem;
+      border: 2px solid #8B1A1A;
+      border-radius: 4px;
+    }
+
+    /* Manuscript card */
+    .ms-card {
+      display: flex;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #d4c4a8;
+    }
+
+    .ms-left {
+      width: 60px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .ms-id {
+      color: #8B1A1A;
+      font-size: 1.3rem;
+      margin: 0 0 0.4rem 0;
+      line-height: 1.1;
+    }
+
+    .ms-icon {
+      width: 50px;
+      height: 50px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .ms-right h3 {
+      margin: 0 0 0.4rem 0;
+      color: #2C1A0E;
+    }
+
+    .ms-right p {
+      margin: 0.4rem 0 0.6rem 0;
+    }
+
+    .ms-links-secondary {
+      margin-top: 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .ms-links-secondary a {
+      color: #1A3A6E;
+      margin-right: 1rem;
+      text-decoration: none;
+    }
+
+    .ms-links-secondary a:hover {
+      color: #D4AF37;
+    }
+
+    .leaflet-popup-content {
+      font-family: 'IM Fell English', 'Times New Roman', serif;
+      line-height: 1.4;
+    }
+
+    .popup-filter-btn {
+      display: inline-block;
+      margin-top: 0.6rem;
+      padding: 0.3rem 0.7rem;
+      background: #8B1A1A;
+      color: #F5E8C7;
+      text-decoration: none;
+      border-radius: 3px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    .popup-filter-btn:hover {
+      background: #1A3A6E;
+      color: #F5E8C7;
+    }
+
+    @media (max-width: 700px) {
+      .ms-card {
+        flex-direction: column;
+      }
+      .ms-left {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar-placeholder"></div>
+
+  <main>
+    <h1>Manuscripts</h1>
+    <p>Old English manuscripts and fragments in continental libraries.</p>
+
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="type-toggles">
+        <label>
+          <input type="checkbox" id="filterDigitized">
+          Only show fully digitized manuscripts and fragments
+        </label>
+      </div>
+
+      <div class="type-toggles">
+        <label><input type="checkbox" id="filterFull" checked> Full manuscripts</label>
+        <label><input type="checkbox" id="filterFragment" checked> Fragments</label>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterCountry">Country</label>
+        <select id="filterCountry">
+          <option value="">All countries</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterCity">City</label>
+        <select id="filterCity">
+          <option value="">All cities</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterInstitution">Institution</label>
+        <select id="filterInstitution">
+          <option value="">All institutions</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- List of manuscript cards -->
+    <div id="msContainer">
+      <p>Loading manuscripts…</p>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="assets/js/main.js"></script>
+  <script>
+    const CSV_URL = 'assets/data/mss.csv';
+    let allManuscripts = [];
+    let map, markersLayer;
+
+    // ---------- Load data ----------
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        allManuscripts = results.data
+          .filter(row => row['OE-CONNECT ID'])
+          .sort((a, b) => parseInt(a['OE-CONNECT ID']) - parseInt(b['OE-CONNECT ID']));
+
+        populateFilterOptions();
+        initMap();
+        render();
+      },
+      error: function(err) {
+        document.getElementById('msContainer').innerHTML = '<p>Could not load mss.csv</p>';
+        console.error(err);
+      }
+    });
+
+    // ---------- Filters ----------
+    document.getElementById('filterDigitized').addEventListener('change', render);
+    document.getElementById('filterFull').addEventListener('change', render);
+    document.getElementById('filterFragment').addEventListener('change', render);
+    document.getElementById('filterCountry').addEventListener('change', render);
+    document.getElementById('filterCity').addEventListener('change', render);
+    document.getElementById('filterInstitution').addEventListener('change', render);
+
+    function populateFilterOptions() {
+      const countries = [...new Set(allManuscripts.map(m => m.Country).filter(Boolean))].sort();
+      const cities = [...new Set(allManuscripts.map(m => m.City).filter(Boolean))].sort();
+      const institutions = [...new Set(allManuscripts.map(m => m.Institution).filter(Boolean))].sort();
+
+      fillSelect('filterCountry', countries);
+      fillSelect('filterCity', cities);
+      fillSelect('filterInstitution', institutions);
+    }
+
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      values.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+      });
+    }
+
+    function getFiltered() {
+      const onlyDigitized = document.getElementById('filterDigitized').checked;
+      const showFull = document.getElementById('filterFull').checked;
+      const showFragment = document.getElementById('filterFragment').checked;
+      const country = document.getElementById('filterCountry').value;
+      const city = document.getElementById('filterCity').value;
+      const institution = document.getElementById('filterInstitution').value;
+
+      return allManuscripts.filter(m => {
+        // Digitized filter
+        if (onlyDigitized && !m.URL_DIGITAL) return false;
+
+        const type = (m['Fragment or full'] || '').trim();
+        if (type === 'Full MS' && !showFull) return false;
+        if (type === 'Fragment' && !showFragment) return false;
+        if (country && m.Country !== country) return false;
+        if (city && m.City !== city) return false;
+        if (institution && m.Institution !== institution) return false;
+        return true;
+      });
+    }
+
+    // ---------- Render list + map ----------
+    function render() {
+      const filtered = getFiltered();
+      renderCards(filtered);
+      updateMap(filtered);
+    }
+
+    function renderCards(list) {
+      const container = document.getElementById('msContainer');
+      if (list.length === 0) {
+        container.innerHTML = '<p>No manuscripts match the current filters.</p>';
+        return;
+      }
+
+      let html = '';
+      list.forEach(m => {
+        const id = m['OE-CONNECT ID'] || '';
+        const type = (m['Fragment or full'] || '').trim();
+        const icon = type === 'Fragment'
+          ? 'assets/images/icon.fragment.png'
+          : 'assets/images/icon.ms.png';
+
+        const digital = m.URL_DIGITAL
+          ? `<p><a href="${m.URL_DIGITAL}" target="_blank">Link to digitized manuscript</a></p>`
+          : `<p><em>No full digital version available</em></p>`;
+
+        const secondary = [];
+        if (m['Ker ID'] && m.URL_Searobend) {
+          secondary.push(`<a href="${m.URL_Searobend}" target="_blank">${m['Ker ID']}</a>`);
+        }
+        if (m.URL_GN) {
+          secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge</a>`);
+        }
+        if (m.URL_ASMMF) {
+          secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMFF</a>`);
+        }
+
+        html += `
+          <div class="ms-card">
+            <div class="ms-left">
+              <h3 class="ms-id">${id}</h3>
+              <img src="${icon}" alt="${type}" class="ms-icon">
+            </div>
+            <div class="ms-right">
+              <h3>${m.SHELFMARK || 'Untitled'}</h3>
+              <p>${m['OE contents'] || ''}</p>
+              ${digital}
+              ${secondary.length ? `<div class="ms-links-secondary">${secondary.join(' · ')}</div>` : ''}
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
+    }
+
+    // ---------- Leaflet map ----------
+    function initMap() {
+      map = L.map('map', {
+        center: [50.5, 10],
+        zoom: 4,
+        maxBounds: [[30, -15], [72, 40]] // roughly Europe
+      });
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+    }
+
+    function updateMap(list) {
+      markersLayer.clearLayers();
+
+      // Group by city + country
+      const groups = {};
+      list.forEach(m => {
+        if (!m.latitude || !m.longitude || !m.City) return;
+        const key = m.City + '|' + (m.Country || '');
+        if (!groups[key]) {
+          groups[key] = {
+            city: m.City,
+            country: m.Country || '',
+            lat: parseFloat(m.latitude),
+            lng: parseFloat(m.longitude),
+            full: 0,
+            fragment: 0
+          };
+        }
+        const type = (m['Fragment or full'] || '').trim();
+        if (type === 'Full MS') groups[key].full++;
+        else if (type === 'Fragment') groups[key].fragment++;
+      });
+
+      Object.values(groups).forEach(g => {
+        const total = g.full + g.fragment;
+        let color;
+        if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';      // both → cloisonné red
+        else if (g.full > 0) color = '#D4AF37';                 // only full → gold
+        else color = '#1A3A6E';                                // only fragments → blue
+
+        const icon = L.divIcon({
+          className: 'custom-marker',
+          html: `<div style="
+            background:${color};
+            color:#F5E8C7;
+            width:28px;height:28px;
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            font-weight:bold;font-size:13px;
+            border:2px solid #F5E8C7;
+            box-shadow:0 1px 4px rgba(0,0,0,0.4);
+          ">${total}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
+
+        let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
+        if (g.full > 0) popup += `Number of full manuscripts: ${g.full}<br>`;
+        if (g.fragment > 0) popup += `Number of fragments: ${g.fragment}<br>`;
+        popup += `<a class="popup-filter-btn" onclick="filterByCity('${g.city.replace(/'/g, "\\'")}')">Use location as filter</a>`;
+
+        marker.bindPopup(popup);
+      });
+    }
+
+    // Called from the popup button
+    window.filterByCity = function(cityName) {
+      document.getElementById('filterCity').value = cityName;
+      document.getElementById('filterCountry').value = '';
+      document.getElementById('filterInstitution').value = '';
+      render();
+    };
+  </script>
+</body>
+</html>
