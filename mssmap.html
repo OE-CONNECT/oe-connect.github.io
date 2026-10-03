@@ -210,6 +210,7 @@
     let allManuscripts = [];
     let map, markersLayer;
     let mapInitialized = false;
+    let filterCity = '';
 
     // ---------- Load data ----------
     Papa.parse(CSV_URL, {
@@ -242,17 +243,10 @@
     document.getElementById('filterFull').addEventListener('change', render);
     document.getElementById('filterFragment').addEventListener('change', render);
     document.getElementById('filterCountry').addEventListener('change', render);
-    document.getElementById('filterCity').addEventListener('change', render);
-    document.getElementById('filterInstitution').addEventListener('change', render);
 
     function populateFilterOptions() {
       const countries = [...new Set(allManuscripts.map(m => m.Country).filter(Boolean))].sort();
-      const cities = [...new Set(allManuscripts.map(m => m.City).filter(Boolean))].sort();
-      const institutions = [...new Set(allManuscripts.map(m => m.Institution).filter(Boolean))].sort();
-
       fillSelect('filterCountry', countries);
-      fillSelect('filterCity', cities);
-      fillSelect('filterInstitution', institutions);
     }
 
     function fillSelect(id, values) {
@@ -270,19 +264,15 @@
       const showFull = document.getElementById('filterFull').checked;
       const showFragment = document.getElementById('filterFragment').checked;
       const country = document.getElementById('filterCountry').value;
-      const city = document.getElementById('filterCity').value;
-      const institution = document.getElementById('filterInstitution').value;
 
       return allManuscripts.filter(m => {
-        // Digitized filter
         if (onlyDigitized && !m.URL_DIGITAL) return false;
 
         const type = (m['Fragment or full'] || '').trim();
         if (type === 'Full MS' && !showFull) return false;
         if (type === 'Fragment' && !showFragment) return false;
         if (country && m.Country !== country) return false;
-        if (city && m.City !== city) return false;
-        if (institution && m.Institution !== institution) return false;
+        if (filterCity && m.City !== filterCity) return false;
         return true;
       });
     }
@@ -356,7 +346,6 @@
 
       markersLayer = L.layerGroup().addTo(map);
 
-      // Force map to recalculate size after all animations settle
       setTimeout(() => {
         if (map) {
           map.invalidateSize();
@@ -367,7 +356,6 @@
     function updateMap(list) {
       markersLayer.clearLayers();
 
-      // Group by city + country
       const groups = {};
       list.forEach(m => {
         if (!m.latitude || !m.longitude || !m.City) return;
@@ -390,9 +378,9 @@
       Object.values(groups).forEach(g => {
         const total = g.full + g.fragment;
         let color;
-        if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';      // both → cloisonné red
-        else if (g.full > 0) color = '#D4AF37';                 // only full → gold
-        else color = '#1A3A6E';                                // only fragments → blue
+        if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';
+        else if (g.full > 0) color = '#D4AF37';
+        else color = '#1A3A6E';
 
         const icon = L.divIcon({
           className: 'custom-marker',
@@ -421,11 +409,9 @@
       });
     }
 
-    // Called from the popup button
     window.filterByCity = function(cityName) {
-      document.getElementById('filterCity').value = cityName;
+      filterCity = cityName;
       document.getElementById('filterCountry').value = '';
-      document.getElementById('filterInstitution').value = '';
       render();
     };
   </script>
