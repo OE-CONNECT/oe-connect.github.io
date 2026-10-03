@@ -73,279 +73,269 @@
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const CSV_URL = 'assets/data/mss.csv';
-    let allManuscripts = [];
-    let map, markersLayer;
-    let mapInitialized = false;
-    let filterCity = '';
+  const CSV_URL = 'assets/data/mss.csv';
+  let allManuscripts = [];
+  let map, markersLayer;
+  let filterCity = '';
 
-    // ---------- Load data ----------
-    Papa.parse(CSV_URL, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function(results) {
-        allManuscripts = results.data
-          .filter(row => row['OE-CONNECT ID'])
-          .sort((a, b) => parseInt(a['OE-CONNECT ID']) - parseInt(b['OE-CONNECT ID']));
+  // ---------- Load data ----------
+  Papa.parse(CSV_URL, {
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+    complete: function(results) {
+      allManuscripts = results.data
+        .filter(row => row['OE-CONNECT ID'])
+        .sort((a, b) => parseInt(a['OE-CONNECT ID']) - parseInt(b['OE-CONNECT ID']));
 
-        // Delay map init to let navbar load and page layout settle
-        if (!mapInitialized) {
-          mapInitialized = true;
-          setTimeout(() => {
-            populateFilterOptions();
-            initMap();
-            render();
-          }, 500);
-        }
-      },
-      error: function(err) {
-        document.getElementById('msContainer').innerHTML = '<p>Could not load mss.csv</p>';
-        console.error(err);
-      }
+      // Small delay so the navbar has time to load
+      setTimeout(() => {
+        populateFilterOptions();
+        initMap();
+        render();
+      }, 500);
+    },
+    error: function(err) {
+      document.getElementById('msContainer').innerHTML = '<p>Could not load mss.csv</p>';
+      console.error(err);
+    }
+  });
+
+  // ---------- Filters ----------
+  document.getElementById('filterDigitized').addEventListener('change', render);
+  document.getElementById('filterFull').addEventListener('change', render);
+  document.getElementById('filterFragment').addEventListener('change', render);
+  document.getElementById('filterCountry').addEventListener('change', render);
+
+  function populateFilterOptions() {
+    const countries = [...new Set(allManuscripts.map(m => m.Country).filter(Boolean))].sort();
+    fillSelect('filterCountry', countries);
+  }
+
+  function fillSelect(id, values) {
+    const select = document.getElementById(id);
+    values.forEach(v => {
+      const opt = document.createElement('option');
+      opt.value = v;
+      opt.textContent = v;
+      select.appendChild(opt);
+    });
+  }
+
+  function getFiltered() {
+    const onlyDigitized = document.getElementById('filterDigitized').checked;
+    const showFull = document.getElementById('filterFull').checked;
+    const showFragment = document.getElementById('filterFragment').checked;
+    const country = document.getElementById('filterCountry').value;
+
+    return allManuscripts.filter(m => {
+      if (onlyDigitized && !m.URL_DIGITAL) return false;
+
+      const type = (m['Fragment or full'] || '').trim();
+      if (type === 'Full MS' && !showFull) return false;
+      if (type === 'Fragment' && !showFragment) return false;
+      if (country && m.Country !== country) return false;
+      if (filterCity && m.City !== filterCity) return false;
+      return true;
+    });
+  }
+
+  // ---------- Render list + map ----------
+  function render() {
+    const filtered = getFiltered();
+    updateResultsTitle(filtered);
+    updateFilterBadges();
+    renderCards(filtered);
+    updateMap(filtered);
+  }
+
+  function updateResultsTitle(filtered) {
+    let manuscriptCount = 0;
+    let fragmentCount = 0;
+
+    filtered.forEach(m => {
+      const type = (m['Fragment or full'] || '').trim();
+      if (type === 'Full MS') manuscriptCount++;
+      else if (type === 'Fragment') fragmentCount++;
     });
 
-    // ---------- Filters ----------
-    document.getElementById('filterDigitized').addEventListener('change', render);
-    document.getElementById('filterFull').addEventListener('change', render);
-    document.getElementById('filterFragment').addEventListener('change', render);
-    document.getElementById('filterCountry').addEventListener('change', render);
+    document.getElementById('resultsTitle').textContent =
+      `Showing ${manuscriptCount} manuscripts and ${fragmentCount} fragments`;
+  }
 
-    function populateFilterOptions() {
-      const countries = [...new Set(allManuscripts.map(m => m.Country).filter(Boolean))].sort();
-      fillSelect('filterCountry', countries);
+  function updateFilterBadges() {
+    const country = document.getElementById('filterCountry').value;
+    const countryBadge = document.getElementById('countryFilterBadge');
+    const cityBadge = document.getElementById('cityFilterBadge');
+
+    if (country) {
+      countryBadge.classList.add('active');
+      document.getElementById('countryFilterName').textContent = country;
+    } else {
+      countryBadge.classList.remove('active');
     }
 
-    function fillSelect(id, values) {
-      const select = document.getElementById(id);
-      values.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v;
-        opt.textContent = v;
-        select.appendChild(opt);
-      });
+    if (filterCity) {
+      cityBadge.classList.add('active');
+      document.getElementById('cityFilterName').textContent = filterCity;
+    } else {
+      cityBadge.classList.remove('active');
+    }
+  }
+
+  function renderCards(list) {
+    const container = document.getElementById('msContainer');
+    if (list.length === 0) {
+      container.innerHTML = '<p>No manuscripts match the current filters.</p>';
+      return;
     }
 
-    function getFiltered() {
-      const onlyDigitized = document.getElementById('filterDigitized').checked;
-      const showFull = document.getElementById('filterFull').checked;
-      const showFragment = document.getElementById('filterFragment').checked;
-      const country = document.getElementById('filterCountry').value;
+    let html = '';
+    list.forEach(m => {
+      const id = m['OE-CONNECT ID'] || '';
+      const type = (m['Fragment or full'] || '').trim();
+      const icon = type === 'Fragment'
+        ? 'assets/images/icon.fragment.png'
+        : 'assets/images/icon.ms.png';
 
-      return allManuscripts.filter(m => {
-        if (onlyDigitized && !m.URL_DIGITAL) return false;
+      const digital = m.URL_DIGITAL
+        ? `<p><a href="${m.URL_DIGITAL}" target="_blank">Link to digitized manuscript</a></p>`
+        : `<p><em>No full digital version available</em></p>`;
 
-        const type = (m['Fragment or full'] || '').trim();
-        if (type === 'Full MS' && !showFull) return false;
-        if (type === 'Fragment' && !showFragment) return false;
-        if (country && m.Country !== country) return false;
-        if (filterCity && m.City !== filterCity) return false;
-        return true;
-      });
-    }
-
-    // ---------- Render list + map ----------
-    function render() {
-      const filtered = getFiltered();
-      updateResultsTitle(filtered);
-      updateFilterBadges();
-      renderCards(filtered);
-      updateMap(filtered);
-    }
-
-    function updateResultsTitle(filtered) {
-      const manuscriptCount = filtered.filter(m => {
-        const type = (m['Fragment or full'] || '').trim();
-        return type === 'Full MS';
-      }).length;
-
-      const fragmentCount = filtered.filter(m => {
-        const type = (m['Fragment or full'] || '').trim();
-        return type === 'Fragment';
-      }).length;
-
-      const titleElement = document.getElementById('resultsTitle');
-      titleElement.textContent = `Showing ${manuscriptCount} manuscripts and ${fragmentCount} fragments`;
-    }
-
-    function updateFilterBadges() {
-      const country = document.getElementById('filterCountry').value;
-      const countryBadge = document.getElementById('countryFilterBadge');
-      const cityBadge = document.getElementById('cityFilterBadge');
-
-      if (country) {
-        countryBadge.classList.add('active');
-        document.getElementById('countryFilterName').textContent = country;
-      } else {
-        countryBadge.classList.remove('active');
+      const secondary = [];
+      if (m['Ker ID'] && m.URL_Searobend) {
+        secondary.push(`<a href="${m.URL_Searobend}" target="_blank">${m['Ker ID']}</a>`);
+      }
+      if (m.URL_GN) {
+        secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge</a>`);
+      }
+      if (m.URL_ASMMF) {
+        secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF</a>`);
       }
 
-      if (filterCity) {
-        cityBadge.classList.add('active');
-        document.getElementById('cityFilterName').textContent = filterCity;
-      } else {
-        cityBadge.classList.remove('active');
-      }
-    }
-
-    function renderCards(list) {
-      const container = document.getElementById('msContainer');
-      if (list.length === 0) {
-        container.innerHTML = '<p>No manuscripts match the current filters.</p>';
-        return;
-      }
-
-      let html = '';
-      list.forEach(m => {
-        const id = m['OE-CONNECT ID'] || '';
-        const type = (m['Fragment or full'] || '').trim();
-        const icon = type === 'Fragment'
-          ? 'assets/images/icon.fragment.png'
-          : 'assets/images/icon.ms.png';
-
-        const digital = m.URL_DIGITAL
-          ? `<p><a href="${m.URL_DIGITAL}" target="_blank">Link to digitized manuscript</a></p>`
-          : `<p><em>No full digital version available</em></p>`;
-
-        const secondary = [];
-        if (m['Ker ID'] && m.URL_Searobend) {
-          secondary.push(`<a href="${m.URL_Searobend}" target="_blank">${m['Ker ID']}</a>`);
-        }
-        if (m.URL_GN) {
-          secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge</a>`);
-        }
-        if (m.URL_ASMMF) {
-          secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF</a>`);
-        }
-
-        html += `
-          <div class="ms-card">
-            <div class="ms-left">
-              <h3 class="ms-id">${id}</h3>
-              <img src="${icon}" alt="${type}" class="ms-icon">
-            </div>
-            <div class="ms-right">
-              <h3>${m.SHELFMARK || 'Untitled'}</h3>
-              <p>${m['OE contents'] || ''}</p>
-              ${digital}
-              ${secondary.length ? `<div class="ms-links-secondary">${secondary.join(' · ')}</div>` : ''}
-            </div>
+      html += `
+        <div class="ms-card">
+          <div class="ms-left">
+            <h3 class="ms-id">${id}</h3>
+            <img src="${icon}" alt="${type}" class="ms-icon">
           </div>
-        `;
-      });
-      container.innerHTML = html;
-    }
+          <div class="ms-right">
+            <h3>${m.SHELFMARK || 'Untitled'}</h3>
+            <p>${m['OE contents'] || ''}</p>
+            ${digital}
+            ${secondary.length ? `<div class="ms-links-secondary">${secondary.join(' · ')}</div>` : ''}
+          </div>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
 
-    // ---------- Leaflet map ----------
-    function initMap() {
-      map = L.map('map', {
-        center: [50.5, 10],
-        zoom: 4,
-        maxBounds: [[30, -15], [72, 40]]
-      });
+  // ---------- Leaflet map ----------
+  function initMap() {
+    map = L.map('map', {
+      center: [50.5, 10],
+      zoom: 4,
+      maxBounds: [[30, -15], [72, 40]]
+    });
 
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-      }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-      markersLayer = L.layerGroup().addTo(map);
+    markersLayer = L.layerGroup().addTo(map);
 
-      setTimeout(() => {
-        if (map) {
-          map.invalidateSize();
-        }
-      }, 100);
-    }
+    setTimeout(() => {
+      if (map) map.invalidateSize();
+    }, 100);
+  }
 
-    function updateMap(list) {
-      markersLayer.clearLayers();
+  function updateMap(list) {
+    markersLayer.clearLayers();
 
-      const groups = {};
-      list.forEach(m => {
-        if (!m.latitude || !m.longitude || !m.City) return;
-        const key = m.City + '|' + (m.Country || '');
-        if (!groups[key]) {
-          groups[key] = {
-            city: m.City,
-            country: m.Country || '',
-            lat: parseFloat(m.latitude),
-            lng: parseFloat(m.longitude),
-            full: 0,
-            fragment: 0
-          };
-        }
-        const type = (m['Fragment or full'] || '').trim();
-        if (type === 'Full MS') groups[key].full++;
-        else if (type === 'Fragment') groups[key].fragment++;
-      });
-
-      Object.values(groups).forEach(g => {
-        const total = g.full + g.fragment;
-        let color;
-        if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';
-        else if (g.full > 0) color = '#D4AF37';
-        else color = '#1A3A6E';
-
-        const icon = L.divIcon({
-          className: 'custom-marker',
-          html: `<div style="
-            background:${color};
-            color:#F5E8C7;
-            width:28px;height:28px;
-            border-radius:50%;
-            display:flex;align-items:center;justify-content:center;
-            font-weight:bold;font-size:13px;
-            border:2px solid #F5E8C7;
-            box-shadow:0 1px 4px rgba(0,0,0,0.4);
-          ">${total}</div>`,
-          iconSize: [28, 28],
-          iconAnchor: [14, 14]
-        });
-
-        const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
-
-        let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
-        if (g.full > 0) popup += `Number of full manuscripts: ${g.full}<br>`;
-        if (g.fragment > 0) popup += `Number of fragments: ${g.fragment}<br>`;
-        popup += `<a class="popup-filter-btn" onclick="filterByCity('${g.city.replace(/'/g, "\\'")}')">Use location as filter</a>`;
-
-        marker.bindPopup(popup);
-      });
-
-      // Zoom the map to the selected country (or reset when "All countries")
-      const country = document.getElementById('filterCountry').value;
-      const layers = markersLayer.getLayers();
-
-      if (country && layers.length > 0) {
-        if (layers.length === 1) {
-          // Only one city → use a comfortable fixed zoom
-          const latlng = layers[0].getLatLng();
-          map.setView(latlng, 8);
-        } else {
-          // Multiple cities → fit all of them
-          const group = L.featureGroup(layers);
-          map.fitBounds(group.getBounds().pad(0.25));
-        }
-      } else if (!country) {
-        map.setView([50.5, 10], 4);
+    const groups = {};
+    list.forEach(m => {
+      if (!m.latitude || !m.longitude || !m.City) return;
+      const key = m.City + '|' + (m.Country || '');
+      if (!groups[key]) {
+        groups[key] = {
+          city: m.City,
+          country: m.Country || '',
+          lat: parseFloat(m.latitude),
+          lng: parseFloat(m.longitude),
+          full: 0,
+          fragment: 0
+        };
       }
-    }
+      const type = (m['Fragment or full'] || '').trim();
+      if (type === 'Full MS') groups[key].full++;
+      else if (type === 'Fragment') groups[key].fragment++;
+    });
 
-    window.filterByCity = function(cityName) {
-      filterCity = cityName;
-      document.getElementById('filterCountry').value = '';
-      render();
-    };
+    Object.values(groups).forEach(g => {
+      const total = g.full + g.fragment;
+      let color;
+      if (g.full > 0 && g.fragment > 0) color = '#8B1A1A';
+      else if (g.full > 0) color = '#D4AF37';
+      else color = '#1A3A6E';
 
-    function clearCityFilter() {
-      filterCity = '';
-      render();
-    }
+      const icon = L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="
+          background:${color};
+          color:#F5E8C7;
+          width:28px;height:28px;
+          border-radius:50%;
+          display:flex;align-items:center;justify-content:center;
+          font-weight:bold;font-size:13px;
+          border:2px solid #F5E8C7;
+          box-shadow:0 1px 4px rgba(0,0,0,0.4);
+        ">${total}</div>`,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14]
+      });
 
-    function clearCountryFilter() {
-      document.getElementById('filterCountry').value = '';
-      render();
+      const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
+
+      let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
+      if (g.full > 0) popup += `Number of full manuscripts: ${g.full}<br>`;
+      if (g.fragment > 0) popup += `Number of fragments: ${g.fragment}<br>`;
+      popup += `<a class="popup-filter-btn" onclick="filterByCity('${g.city.replace(/'/g, "\\'")}')">Use location as filter</a>`;
+
+      marker.bindPopup(popup);
+    });
+
+    // Zoom behaviour
+    const country = document.getElementById('filterCountry').value;
+    const layers = markersLayer.getLayers();
+
+    if (country && layers.length > 0) {
+      if (layers.length === 1) {
+        map.setView(layers[0].getLatLng(), 8);
+      } else {
+        const group = L.featureGroup(layers);
+        map.fitBounds(group.getBounds().pad(0.25));
+      }
+    } else if (!country) {
+      map.setView([50.5, 10], 4);
     }
-  </script>
+  }
+
+  window.filterByCity = function(cityName) {
+    filterCity = cityName;
+    document.getElementById('filterCountry').value = '';
+    render();
+  };
+
+  function clearCityFilter() {
+    filterCity = '';
+    render();
+  }
+
+  function clearCountryFilter() {
+    document.getElementById('filterCountry').value = '';
+    render();
+  }
+</script>
 </body>
 </html>
