@@ -158,6 +158,8 @@
 </head>
 <body>
 
+  <div id="navbar-placeholder"></div>
+
   <main>
     <h1>Manuscripts</h1>
     <p>Old English manuscripts and fragments in continental libraries.</p>
@@ -214,27 +216,7 @@
     const CSV_URL = 'assets/data/mss.csv';
     let allManuscripts = [];
     let map, markersLayer;
-    let navbarLoaded = false;
-
-    // Listen for navbar load completion
-    const navbarObserver = new MutationObserver(() => {
-      const nav = document.querySelector('.main-nav');
-      if (nav && !navbarLoaded) {
-        navbarLoaded = true;
-        navbarObserver.disconnect();
-        // Trigger initialization if CSV is also loaded
-        if (allManuscripts.length > 0) {
-          populateFilterOptions();
-          initMap();
-          render();
-        }
-      }
-    });
-
-    navbarObserver.observe(document.getElementById('navbar-placeholder'), {
-      childList: true,
-      subtree: true
-    });
+    let mapInitialized = false;
 
     // ---------- Load data ----------
     Papa.parse(CSV_URL, {
@@ -246,11 +228,14 @@
           .filter(row => row['OE-CONNECT ID'])
           .sort((a, b) => parseInt(a['OE-CONNECT ID']) - parseInt(b['OE-CONNECT ID']));
 
-        // Only initialize if navbar is already loaded
-        if (navbarLoaded) {
-          populateFilterOptions();
-          initMap();
-          render();
+        // Delay map init to let navbar load and page layout settle
+        if (!mapInitialized) {
+          mapInitialized = true;
+          setTimeout(() => {
+            populateFilterOptions();
+            initMap();
+            render();
+          }, 500);
         }
       },
       error: function(err) {
@@ -366,11 +351,10 @@
 
     // ---------- Leaflet map ----------
     function initMap() {
-      // Force a layout recalculation before initializing Leaflet
       map = L.map('map', {
         center: [50.5, 10],
         zoom: 4,
-        maxBounds: [[30, -15], [72, 40]] // roughly Europe
+        maxBounds: [[30, -15], [72, 40]]
       });
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -379,8 +363,12 @@
 
       markersLayer = L.layerGroup().addTo(map);
 
-      // Invalidate size after a short delay to account for DOM reflow
-      setTimeout(() => map.invalidateSize(), 300);
+      // Force map to recalculate size after all animations settle
+      setTimeout(() => {
+        if (map) {
+          map.invalidateSize();
+        }
+      }, 100);
     }
 
     function updateMap(list) {
