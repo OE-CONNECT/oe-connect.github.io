@@ -1,0 +1,30 @@
+name: Sync Events CSV from Google Sheets
+
+on:
+  schedule:
+    # Every 30 minutes (adjust as needed)
+    - cron: '*/30 * * * *'
+  workflow_dispatch:   # Allows manual trigger from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download CSV from Google Sheets
+        run: |
+          curl -L -o assets/data/events.csv \
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vTkYM8BFpPiqinOeZJchhw4evXCPQGpp-vNO0cdlO28KcKwDaKnEwUgemcP-EwhYnc8FrROyw8BOtss/pub?gid=646996331&single=true&output=csv"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/data/events.csv
+          git diff --staged --quiet || git commit -m "chore: update events.csv from Google Sheets"
+          git push
