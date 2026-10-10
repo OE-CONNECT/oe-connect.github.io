@@ -14,20 +14,26 @@
   <div id="navbar-placeholder"></div>
 
   <main>
-    <h1>Research Projects</h1>
-    <p>Overview of research projects related to Old English studies on the Continent.</p>
+    <header>
+      <h1>Projects</h1>
+      <p>Here is an overview of research projects relating to Old English at continental European institutions.</p>
+    </header>
+
+    <p>This overview is intended to showcase continental European research in the field of Old English Studies as well as facilitate making connections with European research partners.
+    <br><br> If you would like your research project to appear on this page, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.
+    We will then send you a short form to fill in the event details.</p>
 
     <!-- Filters -->
     <div class="filters-bar">
       <div class="filter-group">
-        <label for="filterCountry">Country</label>
+        <label for="filterCountry">Filter by country</label>
         <select id="filterCountry">
           <option value="">All countries</option>
         </select>
       </div>
 
-      <div class="filter-group">
-        <label for="filterInstitution">Institution</label>
+      <div class="filter-group" style="max-width: 200px;">
+        <label for="filterInstitution">Filter by institution</label>
         <select id="filterInstitution">
           <option value="">All institutions</option>
         </select>
@@ -42,15 +48,15 @@
     <!-- Filter badges -->
     <div class="filter-badges" id="filterBadges">
       <div id="countryBadge" class="filter-badge">
-        <span>Country: <strong id="countryBadgeText"></strong></span>
+        <span>Filtering by country: <strong id="countryBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearCountry()">Clear</button>
       </div>
       <div id="institutionBadge" class="filter-badge">
-        <span>Institution: <strong id="institutionBadgeText"></strong></span>
+        <span>Filtering by institution: <strong id="institutionBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearInstitution()">Clear</button>
       </div>
       <div id="searchBadge" class="filter-badge">
-        <span>Search: <strong id="searchBadgeText"></strong></span>
+        <span>Filtering by search: <strong id="searchBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearSearch()">Clear</button>
       </div>
     </div>
