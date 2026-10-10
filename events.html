@@ -23,15 +23,17 @@
 
     <!-- Filters -->
     <div class="filters-bar">
-      <label>Filter by format:</label>
-      <div class="type-toggles">
-        <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
-        <label><input type="checkbox" class="format-filter" value="Online" checked> Online</label>
-        <label><input type="checkbox" class="format-filter" value="Hybrid" checked> Hybrid</label>
+      <div class="filter-group">
+        <label for="formatFilterSelect">Format</label>
+        <select id="formatFilterSelect">
+          <option value="">All formats</option>
+          <option value="On campus">On campus</option>
+          <option value="Online">Online</option>
+        </select>
       </div>
 
       <div class="filter-group">
-        <label for="countryFilterSelect">Filter by country</label>
+        <label for="countryFilterSelect">Country</label>
         <select id="countryFilterSelect">
           <option value="">All countries</option>
         </select>
@@ -41,11 +43,11 @@
     <!-- Filter badges -->
     <div class="filter-badges" id="filterBadges">
       <div id="formatBadge" class="filter-badge">
-        <span>Filtering by format: <strong id="formatBadgeText"></strong></span>
+        <span>Format: <strong id="formatBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFormatFilter()">Clear</button>
       </div>
       <div id="countryBadge" class="filter-badge">
-        <span>Filtering by country: <strong id="countryBadgeText"></strong></span>
+        <span>Country: <strong id="countryBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearCountryFilter()">Clear</button>
       </div>
     </div>
@@ -81,10 +83,7 @@
       }
     });
 
-    document.querySelectorAll('.format-filter').forEach(el => {
-      el.addEventListener('change', render);
-    });
-
+    document.getElementById('formatFilterSelect').addEventListener('change', render);
     document.getElementById('countryFilterSelect').addEventListener('change', render);
 
     function getCountry(ev) {
@@ -129,19 +128,17 @@
     }
 
     function updateBadges() {
-      const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
+      const activeFormat = document.getElementById('formatFilterSelect').value;
       const country = document.getElementById('countryFilterSelect').value;
 
-      // Format badge
       const formatBadge = document.getElementById('formatBadge');
-      if (activeFormats.length > 0 && activeFormats.length < 3) {
+      if (activeFormat) {
         formatBadge.classList.add('active');
-        document.getElementById('formatBadgeText').textContent = activeFormats.join(', ');
+        document.getElementById('formatBadgeText').textContent = activeFormat;
       } else {
         formatBadge.classList.remove('active');
       }
 
-      // Country badge
       const countryBadge = document.getElementById('countryBadge');
       if (country) {
         countryBadge.classList.add('active');
@@ -152,9 +149,7 @@
     }
 
     function clearFormatFilter() {
-      document.querySelectorAll('.format-filter').forEach(el => {
-        el.checked = true;
-      });
+      document.getElementById('formatFilterSelect').value = '';
       render();
     }
 
@@ -164,12 +159,17 @@
     }
 
     function renderEvents() {
-      const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
+      const activeFormat = document.getElementById('formatFilterSelect').value;
       const activeCountry = document.getElementById('countryFilterSelect').value;
 
       const filtered = allEvents.filter(ev => {
         if (ev.APPROVED !== 'TRUE') return false;
-        if (ev.Format && !activeFormats.includes(ev.Format)) return false;
+
+        if (activeFormat) {
+          const eventFormat = (ev.Format || '').trim();
+          if (eventFormat !== 'Hybrid' && eventFormat !== activeFormat) return false;
+        }
+
         const country = getCountry(ev);
         if (activeCountry && country !== activeCountry) return false;
         return true;
