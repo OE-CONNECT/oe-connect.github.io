@@ -260,7 +260,9 @@
           <div class="project-right">
             <h3>${titleText}</h3>
             <p>${p.Description || ''}</p>
-            ${p.Funding ? `<p><strong>Funded by:</strong> ${p.Funding}</p>` : ''}
+            ${p.Funding ? `<p><strong>Funded by:</strong> ${
+            p.Funding.split(';').map(f => f.trim()).filter(Boolean).join(' • ')
+            }</p>` : ''}
             ${institutions ? `<p><strong>Institutions:</strong> ${institutions}</p>` : ''}
             ${websiteLink}
           </div>
