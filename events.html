@@ -21,6 +21,7 @@
     <p>If you would like your conference, summer school, exhibition or other Old English-related event to appear on this page, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.
     We will then send you a short form to fill in the event details.</p>
 
+    <!-- Filters -->
     <div class="filters-bar">
       <div class="type-toggles">
         <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
@@ -36,6 +37,19 @@
       </div>
     </div>
 
+    <!-- Filter badges -->
+    <div class="filter-badges" id="filterBadges">
+      <div id="formatBadge" class="filter-badge">
+        <span>Format: <strong id="formatBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearFormatFilter()">Clear</button>
+      </div>
+      <div id="countryBadge" class="filter-badge">
+        <span>Country: <strong id="countryBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearCountryFilter()">Clear</button>
+      </div>
+    </div>
+
+    <!-- Events container -->
     <div id="eventsContainer">
       <p>Loading events…</p>
     </div>
@@ -58,7 +72,7 @@
       complete: function(results) {
         allEvents = results.data;
         renderCountryFilters();
-        renderEvents();
+        render();
       },
       error: function(err) {
         document.getElementById('eventsContainer').innerHTML = '<p>Could not load events.csv</p>';
@@ -67,10 +81,10 @@
     });
 
     document.querySelectorAll('.format-filter').forEach(el => {
-      el.addEventListener('change', renderEvents);
+      el.addEventListener('change', render);
     });
 
-    document.getElementById('countryFilterSelect').addEventListener('change', renderEvents);
+    document.getElementById('countryFilterSelect').addEventListener('change', render);
 
     function getCountry(ev) {
       return (ev.LocationCountry || ev.locationCountry || '').trim();
@@ -106,6 +120,46 @@
         if (!dateB) return -1;
         return dateB - dateA;
       });
+    }
+
+    function render() {
+      updateBadges();
+      renderEvents();
+    }
+
+    function updateBadges() {
+      const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
+      const country = document.getElementById('countryFilterSelect').value;
+
+      // Format badge
+      const formatBadge = document.getElementById('formatBadge');
+      if (activeFormats.length > 0 && activeFormats.length < 3) {
+        formatBadge.classList.add('active');
+        document.getElementById('formatBadgeText').textContent = activeFormats.join(', ');
+      } else {
+        formatBadge.classList.remove('active');
+      }
+
+      // Country badge
+      const countryBadge = document.getElementById('countryBadge');
+      if (country) {
+        countryBadge.classList.add('active');
+        document.getElementById('countryBadgeText').textContent = country;
+      } else {
+        countryBadge.classList.remove('active');
+      }
+    }
+
+    function clearFormatFilter() {
+      document.querySelectorAll('.format-filter').forEach(el => {
+        el.checked = true;
+      });
+      render();
+    }
+
+    function clearCountryFilter() {
+      document.getElementById('countryFilterSelect').value = '';
+      render();
     }
 
     function renderEvents() {
