@@ -18,27 +18,26 @@
       <p>Here is an overview of Old English events relating to Old English at European continental institutions.</p>
     </header>
 
-<p>If you would like your conference, summer school, exhibition or other Old English-related event to appear on this page, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.
-We will then send you a short form to fill in the event details.</p>
+    <p>If you would like your conference, summer school, exhibition or other Old English-related event to appear on this page, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.
+    We will then send you a short form to fill in the event details.</p>
 
-    <div class="events-layout">
-      <div class="events-main" id="eventsContainer">
-        <p>Loading events…</p>
+    <div class="filters-bar">
+      <div class="type-toggles">
+        <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
+        <label><input type="checkbox" class="format-filter" value="Online" checked> Online</label>
+        <label><input type="checkbox" class="format-filter" value="Hybrid" checked> Hybrid</label>
       </div>
 
-      <aside class="events-sidebar">
-        <div class="filter-group">
-          <h3>Format</h3>
-          <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
-          <label><input type="checkbox" class="format-filter" value="Online" checked> Online</label>
-          <label><input type="checkbox" class="format-filter" value="Hybrid" checked> Hybrid</label>
-        </div>
+      <div class="filter-group">
+        <label for="countryFilterSelect">Country</label>
+        <select id="countryFilterSelect">
+          <option value="">All countries</option>
+        </select>
+      </div>
+    </div>
 
-        <div class="filter-group">
-          <h3>Country</h3>
-          <div id="countryFilters"><p>Loading countries…</p></div>
-        </div>
-      </aside>
+    <div id="eventsContainer">
+      <p>Loading events…</p>
     </div>
   </main>
 
@@ -71,25 +70,21 @@ We will then send you a short form to fill in the event details.</p>
       el.addEventListener('change', renderEvents);
     });
 
+    document.getElementById('countryFilterSelect').addEventListener('change', renderEvents);
+
     function getCountry(ev) {
       return (ev.LocationCountry || ev.locationCountry || '').trim();
     }
 
     function renderCountryFilters() {
       const countries = [...new Set(allEvents.map(getCountry).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-      const container = document.getElementById('countryFilters');
+      const select = document.getElementById('countryFilterSelect');
 
-      if (!countries.length) {
-        container.innerHTML = '<p>No countries available.</p>';
-        return;
-      }
-
-      container.innerHTML = countries.map(country => `
-        <label><input type="checkbox" class="country-filter" value="${country}" checked> ${country}</label>
-      `).join('');
-
-      container.querySelectorAll('.country-filter').forEach(el => {
-        el.addEventListener('change', renderEvents);
+      countries.forEach(country => {
+        const opt = document.createElement('option');
+        opt.value = country;
+        opt.textContent = country;
+        select.appendChild(opt);
       });
     }
 
@@ -115,13 +110,13 @@ We will then send you a short form to fill in the event details.</p>
 
     function renderEvents() {
       const activeFormats = Array.from(document.querySelectorAll('.format-filter:checked')).map(cb => cb.value);
-      const activeCountries = Array.from(document.querySelectorAll('.country-filter:checked')).map(cb => cb.value);
+      const activeCountry = document.getElementById('countryFilterSelect').value;
 
       const filtered = allEvents.filter(ev => {
         if (ev.APPROVED !== 'TRUE') return false;
         if (ev.Format && !activeFormats.includes(ev.Format)) return false;
         const country = getCountry(ev);
-        if (country && !activeCountries.includes(country)) return false;
+        if (activeCountry && country !== activeCountry) return false;
         return true;
       });
 
