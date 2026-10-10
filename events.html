@@ -23,6 +23,7 @@
 
     <!-- Filters -->
     <div class="filters-bar">
+      <label>Filter by format:</label>
       <div class="type-toggles">
         <label><input type="checkbox" class="format-filter" value="On campus" checked> On campus</label>
         <label><input type="checkbox" class="format-filter" value="Online" checked> Online</label>
@@ -30,7 +31,7 @@
       </div>
 
       <div class="filter-group">
-        <label for="countryFilterSelect">Country</label>
+        <label for="countryFilterSelect">Filter by country</label>
         <select id="countryFilterSelect">
           <option value="">All countries</option>
         </select>
@@ -40,11 +41,11 @@
     <!-- Filter badges -->
     <div class="filter-badges" id="filterBadges">
       <div id="formatBadge" class="filter-badge">
-        <span>Format: <strong id="formatBadgeText"></strong></span>
+        <span>Filtering by format: <strong id="formatBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFormatFilter()">Clear</button>
       </div>
       <div id="countryBadge" class="filter-badge">
-        <span>Country: <strong id="countryBadgeText"></strong></span>
+        <span>Filtering by country: <strong id="countryBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearCountryFilter()">Clear</button>
       </div>
     </div>
