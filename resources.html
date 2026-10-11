@@ -3,31 +3,361 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OE-CONNECT: Team</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/css/style.css" rel="stylesheet">
-</head>
+  <title>Resources – OE-CONNECT</title>
 
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+</head>
 <body>
-  <!-- Navbar is loaded here by assets/js/main.js. -->
+
   <div id="navbar-placeholder"></div>
 
   <main>
-    <header>
-      <h1>Resources</h1>
-      <div style="text-align: center;">
-       <img src="/assets/images/logo.png" alt="Project logo">
-      </div>
-      <p>Coming soon!</p>
-    </header>
+    <h1>Resources for Old English Studies</h1>
+    <p>A curated collection of online resources for the study and teaching of Old English.</p>
 
-    <p>Here we will provide a list of resources for teaching and studying Old English.</p>
+    <!-- Filters -->
+    <div class="filters-bar">
+      <div class="filter-group">
+        <label for="filterCategory">Category</label>
+        <select id="filterCategory">
+          <option value="">All categories</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterType">Type</label>
+        <select id="filterType">
+          <option value="">All types</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="filterLevel">Level</label>
+        <select id="filterLevel">
+          <option value="">All levels</option>
+          <option value="Beginner">Beginner</option>
+          <option value="General">General</option>
+          <option value="Advanced">Advanced</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="flex-grow:1; min-width:200px;">
+        <label for="searchBox">Search</label>
+        <input type="text" id="searchBox" placeholder="Search title, description, tags…">
+      </div>
+    </div>
+
+    <!-- Filter badges -->
+    <div class="filter-badges">
+      <div id="categoryBadge" class="filter-badge">
+        <span>Category: <strong id="categoryBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearFilter('filterCategory')">Clear</button>
+      </div>
+      <div id="typeBadge" class="filter-badge">
+        <span>Type: <strong id="typeBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearFilter('filterType')">Clear</button>
+      </div>
+      <div id="levelBadge" class="filter-badge">
+        <span>Level: <strong id="levelBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearFilter('filterLevel')">Clear</button>
+      </div>
+      <div id="searchBadge" class="filter-badge">
+        <span>Search: <strong id="searchBadgeText"></strong></span>
+        <button class="clear-filter-btn" onclick="clearFilter('searchBox')">Clear</button>
+      </div>
+    </div>
+
+    <div id="resourcesContainer">
+      <p>Loading resources…</p>
+    </div>
   </main>
 
-  <!-- Footer is loaded here by assets/js/main.js. -->
   <div id="footer-placeholder"></div>
 
   <script src="assets/js/main.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const CSV_URL = 'assets/data/resources.csv';
+    let allResources = [];
+
+    // Logo mapping based on Type
+    const logoMap = {
+      "Online Course": "logo.course.png",
+      "Grammar": "logo.grammar.png",
+      "Exercises": "logo.exercises.png",
+      "Teaching materials": "logo.teaching.png",
+      "Dictionary": "logo.dictionary.png",
+      "Thesaurus": "logo.thesaurus.png",
+      "Bibliography": "logo.bibliography.png",
+      "Manuscript Collection": "logo.mss.png",
+      "Digital Edition": "logo.diged.png",
+      "Text corpus": "logo.corpus.png",
+      "Database": "logo.database.png",
+      "Software": "logo.software.png",
+      "Font": "logo.font.png",
+      "Blog": "logo.blog.png",
+      "YouTube Channel": "logo.youtube.png",
+      "Video": "logo.video.png",
+      "Society": "logo.society.png",
+      "Website": "logo.website.png",
+      "Other": "logo.other.png"
+    };
+
+    Papa.parse(CSV_URL, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        allResources = results.data
+          .filter(r => r.Title && r.Title.trim() !== '')
+          .sort((a, b) => (parseInt(a.ID) || 0) - (parseInt(b.ID) || 0));
+
+        populateFilterOptions();
+        render();
+      },
+      error: function(err) {
+        document.getElementById('resourcesContainer').innerHTML = '<p>Could not load resources.csv</p>';
+        console.error(err);
+      }
+    });
+
+    // Event listeners
+    ['filterCategory', 'filterType', 'filterLevel'].forEach(id => {
+      document.getElementById(id).addEventListener('change', render);
+    });
+    document.getElementById('searchBox').addEventListener('input', render);
+
+    function populateFilterOptions() {
+      const categories = new Set();
+      const types = new Set();
+
+      allResources.forEach(r => {
+        if (r.Category) {
+          r.Category.split(';').forEach(c => {
+            const cleaned = c.trim();
+            if (cleaned) categories.add(cleaned);
+          });
+        }
+        if (r.Type) {
+          r.Type.split(';').forEach(t => {
+            const cleaned = t.trim();
+            if (cleaned) types.add(cleaned);
+          });
+        }
+      });
+
+      fillSelect('filterCategory', [...categories].sort());
+      fillSelect('filterType', [...types].sort());
+    }
+
+    function fillSelect(id, values) {
+      const select = document.getElementById(id);
+      values.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        select.appendChild(opt);
+      });
+    }
+
+    function getFiltered() {
+      const category = document.getElementById('filterCategory').value;
+      const type = document.getElementById('filterType').value;
+      const level = document.getElementById('filterLevel').value;
+      const search = document.getElementById('searchBox').value.toLowerCase().trim();
+
+      return allResources.filter(r => {
+        if (category) {
+          const cats = (r.Category || '').split(';').map(c => c.trim());
+          if (!cats.includes(category)) return false;
+        }
+        if (type) {
+          const types = (r.Type || '').split(';').map(t => t.trim());
+          if (!types.includes(type)) return false;
+        }
+        if (level) {
+          const levels = (r.Level || '').split(';').map(l => l.trim());
+          if (!levels.includes(level)) return false;
+        }
+        if (search) {
+          const text = [
+            r.Title, r.Description, r.Type, r.Category,
+            r.Level, r.Institution, r.Tags
+          ].join(' ').toLowerCase();
+          if (!text.includes(search)) return false;
+        }
+        return true;
+      });
+    }
+
+    function render() {
+      const filtered = getFiltered();
+      updateBadges();
+
+      // Group by Category
+      const groups = {};
+      filtered.forEach(r => {
+        const cat = (r.Category || 'Other').split(';')[0].trim() || 'Other';
+        if (!groups[cat]) groups[cat] = [];
+        groups[cat].push(r);
+      });
+
+      const sortedCategories = Object.keys(groups).sort();
+
+      let html = '';
+      if (sortedCategories.length === 0) {
+        html = '<p>No resources match the current filters.</p>';
+      } else {
+        sortedCategories.forEach(cat => {
+          const items = groups[cat];
+          html += `<h2 class="group-heading">${cat} (${items.length})</h2>`;
+          items.forEach(r => html += renderCard(r));
+        });
+      }
+
+      document.getElementById('resourcesContainer').innerHTML = html;
+    }
+
+    function updateBadges() {
+      const mapping = [
+        { id: 'filterCategory', badge: 'categoryBadge', text: 'categoryBadgeText' },
+        { id: 'filterType', badge: 'typeBadge', text: 'typeBadgeText' },
+        { id: 'filterLevel', badge: 'levelBadge', text: 'levelBadgeText' },
+        { id: 'searchBox', badge: 'searchBadge', text: 'searchBadgeText' }
+      ];
+
+      mapping.forEach(m => {
+        const value = document.getElementById(m.id).value.trim();
+        const badge = document.getElementById(m.badge);
+        if (value) {
+          badge.classList.add('active');
+          document.getElementById(m.text).textContent = value;
+        } else {
+          badge.classList.remove('active');
+        }
+      });
+    }
+
+    function clearFilter(id) {
+      document.getElementById(id).value = '';
+      render();
+    }
+
+    function getLogo(type) {
+      if (!type) return 'assets/images/logo.other.png';
+      const firstType = type.split(';')[0].trim();
+      const filename = logoMap[firstType] || 'logo.other.png';
+      return `assets/images/${filename}`;
+    }
+
+    function formatMulti(value) {
+      if (!value) return '';
+      return value.split(';')
+        .map(v => v.trim())
+        .filter(Boolean)
+        .join(' • ');
+    }
+
+    function renderCard(r) {
+      const logo = getLogo(r.Type);
+      const typeText = formatMulti(r.Type);
+      const levelText = formatMulti(r.Level);
+      const institutionText = formatMulti(r.Institution);
+
+      const metaParts = [];
+      if (typeText) metaParts.push(typeText);
+      if (levelText) metaParts.push(levelText);
+      if (institutionText) metaParts.push(institutionText);
+      const metaLine = metaParts.join(' • ');
+
+      return `
+        <div class="resource-card">
+          <div class="resource-left">
+            <img src="${logo}" alt="" class="resource-logo" onerror="this.src='assets/images/logo.other.png'">
+          </div>
+          <div class="resource-right">
+            <h3>${r.Title || 'Untitled'}</h3>
+            <div class="resource-description">${r.Description || ''}</div>
+            <p class="resource-link">
+              <a href="${r.URL}" target="_blank" rel="noopener">→ Go to online resource</a>
+            </p>
+            ${metaLine ? `<p class="resource-meta">${metaLine}</p>` : ''}
+          </div>
+        </div>
+      `;
+    }
+  </script>
+
+  <style>
+    .group-heading {
+      margin-top: 2.8rem;
+      margin-bottom: 1.3rem;
+      padding-bottom: 0.35rem;
+      border-bottom: 2px solid #8B1A1A;
+      color: #8B1A1A;
+    }
+
+    .resource-card {
+      display: flex;
+      gap: 1.2rem;
+      margin-bottom: 1.8rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid #d4c4a8;
+    }
+
+    .resource-left {
+      flex-shrink: 0;
+      width: 50px;
+    }
+
+    .resource-logo {
+      width: 50px;
+      height: 50px;
+      object-fit: contain;
+      display: block;
+    }
+
+    .resource-right h3 {
+      margin: 0 0 0.4rem 0;
+      color: #2C1A0E;
+      font-size: 1.25rem;
+    }
+
+    .resource-description {
+      margin-bottom: 0.5rem;
+    }
+
+    .resource-link {
+      margin: 0.4rem 0 0.5rem 0;
+    }
+
+    .resource-link a {
+      font-weight: bold;
+    }
+
+    .resource-meta {
+      font-size: 0.9rem;
+      color: #1A3A6E;
+      margin: 0;
+    }
+
+    #searchBox {
+      width: 100%;
+      padding: 0.35rem 0.6rem;
+      border: 1px solid #8B1A1A;
+      background: #F5E8C7;
+      font-family: inherit;
+    }
+
+    @media (max-width: 600px) {
+      .resource-card {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+    }
+  </style>
 </body>
 </html>
