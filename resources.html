@@ -14,27 +14,31 @@
   <div id="navbar-placeholder"></div>
 
   <main>
-    <h1>Resources for Old English Studies</h1>
+    <header>
+    <h1>Resources</h1>
     <p>A curated collection of online resources for the study and teaching of Old English.</p>
+    </header>
 
+    
+    <p>If you would like to have any additions, corrections or suggestions about resources for Old English Studies, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.</p>
     <!-- Filters -->
     <div class="filters-bar">
       <div class="filter-group">
-        <label for="filterCategory">Category</label>
+        <label for="filterCategory">Filter by category</label>
         <select id="filterCategory">
           <option value="">All categories</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label for="filterType">Type</label>
+        <label for="filterType">Filter by type</label>
         <select id="filterType">
           <option value="">All types</option>
         </select>
       </div>
 
       <div class="filter-group">
-        <label for="filterLevel">Level</label>
+        <label for="filterLevel">Filter by level</label>
         <select id="filterLevel">
           <option value="">All levels</option>
           <option value="Beginner">Beginner</option>
@@ -52,19 +56,19 @@
     <!-- Filter badges -->
     <div class="filter-badges">
       <div id="categoryBadge" class="filter-badge">
-        <span>Category: <strong id="categoryBadgeText"></strong></span>
+        <span>Filtering by category: <strong id="categoryBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFilter('filterCategory')">Clear</button>
       </div>
       <div id="typeBadge" class="filter-badge">
-        <span>Type: <strong id="typeBadgeText"></strong></span>
+        <span>Filtering by type: <strong id="typeBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFilter('filterType')">Clear</button>
       </div>
       <div id="levelBadge" class="filter-badge">
-        <span>Level: <strong id="levelBadgeText"></strong></span>
+        <span>Filtering by level: <strong id="levelBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFilter('filterLevel')">Clear</button>
       </div>
       <div id="searchBadge" class="filter-badge">
-        <span>Search: <strong id="searchBadgeText"></strong></span>
+        <span>Filtering by search: <strong id="searchBadgeText"></strong></span>
         <button class="clear-filter-btn" onclick="clearFilter('searchBox')">Clear</button>
       </div>
     </div>
@@ -73,6 +77,8 @@
       <p>Loading resources…</p>
     </div>
   </main>
+
+  <p style="font-size: x-small;"> List uses various free-for-use icons by <a target="_blank" href="https://icons8.com">Icons8</a>.</p>
 
   <div id="footer-placeholder"></div>
 
