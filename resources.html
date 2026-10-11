@@ -266,6 +266,7 @@
       const typeText = formatMulti(r.Type);
       const levelText = formatMulti(r.Level);
       const institutionText = formatMulti(r.Institution);
+      const tagsText = formatMulti(r.Tags);
 
       const metaParts = [];
       if (typeText) metaParts.push(typeText);
@@ -285,6 +286,7 @@
               <a href="${r.URL}" target="_blank" rel="noopener">→ Go to online resource</a>
             </p>
             ${metaLine ? `<p class="resource-meta">${metaLine}</p>` : ''}
+            ${tagsText ? `<p class="resource-tags">Tags: ${tagsText}</p>` : ''}
           </div>
         </div>
       `;
@@ -341,6 +343,13 @@
     .resource-meta {
       font-size: 0.9rem;
       color: #1A3A6E;
+      margin: 0 0 0.25rem 0;
+    }
+
+    .resource-tags {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: #5A4030;
       margin: 0;
     }
 
