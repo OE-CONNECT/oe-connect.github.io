@@ -45,7 +45,7 @@
 
       <div class="filter-group" style="flex-grow:1; min-width:200px;">
         <label for="searchBox">Search</label>
-        <input type="text" id="searchBox" placeholder="Search title, description, tags…">
+        <input type="text" id="searchBox" placeholder="Search resources…">
       </div>
     </div>
 
@@ -83,7 +83,18 @@
     const CSV_URL = 'assets/data/resources.csv';
     let allResources = [];
 
-    // Logo mapping based on Type
+    // Desired Category order
+    const categoryOrder = [
+      "Learning & Teaching",
+      "Reference Works",
+      "Primary Sources",
+      "Research Tools & Technical Resources",
+      "Public Engagement",
+      "Communities",
+      "Other"
+    ];
+
+    // Logo mapping
     const logoMap = {
       "Online Course": "logo.course.png",
       "Grammar": "logo.grammar.png",
@@ -111,10 +122,7 @@
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
-        allResources = results.data
-          .filter(r => r.Title && r.Title.trim() !== '')
-          .sort((a, b) => (parseInt(a.ID) || 0) - (parseInt(b.ID) || 0));
-
+        allResources = results.data.filter(r => r.Title && r.Title.trim() !== '');
         populateFilterOptions();
         render();
       },
@@ -184,13 +192,27 @@
         }
         if (search) {
           const text = [
-            r.Title, r.Description, r.Type, r.Category,
-            r.Level, r.Institution, r.Tags
+            r.Title,
+            r.Description,
+            r.Category,
+            r.Type,
+            r.Level,
+            r.Tags
           ].join(' ').toLowerCase();
           if (!text.includes(search)) return false;
         }
         return true;
       });
+    }
+
+    // Fisher-Yates shuffle
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
     }
 
     function render() {
@@ -205,17 +227,31 @@
         groups[cat].push(r);
       });
 
-      const sortedCategories = Object.keys(groups).sort();
-
       let html = '';
-      if (sortedCategories.length === 0) {
-        html = '<p>No resources match the current filters.</p>';
-      } else {
-        sortedCategories.forEach(cat => {
-          const items = groups[cat];
+      let hasContent = false;
+
+      // Render in the exact order requested
+      categoryOrder.forEach(cat => {
+        if (groups[cat] && groups[cat].length > 0) {
+          hasContent = true;
+          const items = shuffle(groups[cat]);
           html += `<h2 class="group-heading">${cat} (${items.length})</h2>`;
           items.forEach(r => html += renderCard(r));
-        });
+        }
+      });
+
+      // Catch any unexpected categories
+      Object.keys(groups).forEach(cat => {
+        if (!categoryOrder.includes(cat) && groups[cat].length > 0) {
+          hasContent = true;
+          const items = shuffle(groups[cat]);
+          html += `<h2 class="group-heading">${cat} (${items.length})</h2>`;
+          items.forEach(r => html += renderCard(r));
+        }
+      });
+
+      if (!hasContent) {
+        html = '<p>No resources match the current filters.</p>';
       }
 
       document.getElementById('resourcesContainer').innerHTML = html;
@@ -246,10 +282,15 @@
       render();
     }
 
-    function getLogo(type) {
-      if (!type) return 'assets/images/logo.other.png';
-      const firstType = type.split(';')[0].trim();
-      const filename = logoMap[firstType] || 'logo.other.png';
+    function getLogo(typeString) {
+      if (!typeString) return 'assets/images/logo.other.png';
+
+      const types = typeString.split(';').map(t => t.trim()).filter(Boolean);
+      if (types.length === 0) return 'assets/images/logo.other.png';
+
+      // Randomly pick one of the types for the logo
+      const chosen = types[Math.floor(Math.random() * types.length)];
+      const filename = logoMap[chosen] || 'logo.other.png';
       return `assets/images/${filename}`;
     }
 
@@ -265,14 +306,14 @@
       const logo = getLogo(r.Type);
       const typeText = formatMulti(r.Type);
       const levelText = formatMulti(r.Level);
-      const institutionText = formatMulti(r.Institution);
-      const tagsText = formatMulti(r.Tags);
 
-      const metaParts = [];
-      if (typeText) metaParts.push(typeText);
-      if (levelText) metaParts.push(levelText);
-      if (institutionText) metaParts.push(institutionText);
-      const metaLine = metaParts.join(' • ');
+      let metaLine = '';
+      if (typeText || levelText) {
+        metaLine = typeText;
+        if (levelText) {
+          metaLine += (metaLine ? ' • ' : '') + '<strong>Level:</strong> ' + levelText;
+        }
+      }
 
       return `
         <div class="resource-card">
@@ -286,7 +327,6 @@
               <a href="${r.URL}" target="_blank" rel="noopener">→ Go to online resource</a>
             </p>
             ${metaLine ? `<p class="resource-meta">${metaLine}</p>` : ''}
-            ${tagsText ? `<p class="resource-tags">Tags: ${tagsText}</p>` : ''}
           </div>
         </div>
       `;
@@ -343,13 +383,6 @@
     .resource-meta {
       font-size: 0.9rem;
       color: #1A3A6E;
-      margin: 0 0 0.25rem 0;
-    }
-
-    .resource-tags {
-      font-size: 0.85rem;
-      font-style: italic;
-      color: #5A4030;
       margin: 0;
     }
 
@@ -361,11 +394,6 @@
       font-family: inherit;
     }
 
-    @media (max-width: 600px) {
-      .resource-card {
-        flex-direction: column;
-        gap: 0.8rem;
-      }
     }
   </style>
 </body>
