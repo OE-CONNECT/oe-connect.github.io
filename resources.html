@@ -315,10 +315,10 @@
 
       let metaLine = '';
       if (typeText || levelText) {
-        metaLine = typeText;
-        if (levelText) {
-          metaLine += (metaLine ? ' • ' : '') + '<strong>Level:</strong> ' + levelText;
-        }
+        const parts = [];
+        if (typeText) parts.push(typeText);
+        if (levelText) parts.push('<strong>Level:</strong> ' + levelText);
+        metaLine = parts.join(' || ');
       }
 
       return `
