@@ -79,7 +79,11 @@
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
-        allProjects = results.data.filter(row => row.Title && row.Title.trim() !== '');
+        allProjects = results.data.filter(row => {
+          const title = row.Title && row.Title.trim();
+          const approved = String(row.APPROVED || row.Approved || row.approved || '').trim().toUpperCase();
+          return title && title !== '' && approved === 'TRUE';
+        });
         populateFilterOptions();
         render();
       },
