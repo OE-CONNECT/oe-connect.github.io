@@ -213,8 +213,9 @@
       if (m['Ker ID'] && m.URL_Searobend) {
         secondary.push(`<a href="${m.URL_Searobend}" target="_blank">${m['Ker ID']}</a>`);
       }
-      if (m.URL_GN) {
-        secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge</a>`);
+    if (m.URL_GN) {
+      const gnId = m.URL_GN.split('/').pop();
+      secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge ${gnId}</a>`);
       }
       if (m.URL_ASMMF) {
         secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF</a>`);
