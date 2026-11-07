@@ -1,0 +1,30 @@
+name: Sync Resources CSV from Google Sheets
+
+on:
+  schedule:
+    # Every 30 minutes (adjust as needed)
+    - cron: '*/30 * * * *'
+  workflow_dispatch:   # Allows manual trigger from the Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download CSV from Google Sheets
+        run: |
+          curl -L -o assets/data/resources.csv \
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vRil3VTsSpqBEQlhxx802p_2FhzMKk4Urci2BetPKNZ-lvVEVtm2rUfYXmR80K7KiHBlfi5IrqEFn-l/pub?gid=0&single=true&output=csv"
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "BeowulfBot"
+          git config user.email "BeowulfBot@users.noreply.github.com"
+          git add assets/data/resources.csv
+          git diff --staged --quiet || git commit -m "BeowulfBot's heroic feat: update resources.csv from Google Sheets"
+          git push
