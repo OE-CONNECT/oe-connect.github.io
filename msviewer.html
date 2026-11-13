@@ -40,8 +40,10 @@
   const params = new URLSearchParams(window.location.search);
   const manifest = params.get('manifest') || 'https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:4167709/manifest';
 
-  new Tify({
-    container: '#tify',
-    manifestUrl: manifest
-  });
+new Tify({
+  container: '#tify',
+  manifestUrl: manifest,
+  urlQueryKey: 'tify',
+  urlQueryParams: ['pages', 'pan', 'zoom'] 
+});
 </script>
