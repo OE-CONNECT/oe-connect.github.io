@@ -13,6 +13,9 @@
     --tify-bg-color: #F5E8C7;
      --tify-body-bg: #f8f1e3;
   }
+  .tify-header-title {
+  display: none !important;
+}
 </style>
   
 </head>
@@ -24,7 +27,8 @@
       <header>
       <h1>Manuscript viewer</h1>
       </header>
-
+    
+<h2 id="manuscript-title">Loading manuscript…</h2>
   <div id="tify" style="height: 80vh; width: 100%;"></div>
     
   </main>
@@ -37,10 +41,11 @@
 <script type="module">
   import Tify from 'https://cdn.jsdelivr.net/npm/tify@0.36.2/dist/tify.js';
 
-  // Get the manifest from the web address (if present)
   const params = new URLSearchParams(window.location.search);
   const manifest = params.get('manifest') || 'https://digitalcollections.universiteitleiden.nl/iiif_manifest/item:4167709/manifest';
-
+  const title = params.get('title') || 'Leiden, Leiden University Libraries, VLQ 106'; 
+  document.getElementById('manuscript-title').textContent = 'Viewing ' + title;
+  
 new Tify({
   container: '#tify',
   manifestUrl: manifest,
