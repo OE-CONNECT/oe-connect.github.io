@@ -237,9 +237,9 @@
         ? 'assets/images/icon.fragment.png'
         : 'assets/images/icon.ms.png';
 
-      const digital = m.URL_DIGITAL
-        ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a></p>`
-        : `<p><em>No full digital facsimile available</em></p>`;
+const digital = m.URL_DIGITAL
+  ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : ''}</p>`
+  : `<p><em>No full digital facsimile available</em></p>`;
 
  const secondary = [];
 if (m['Ker ID'] && m.URL_Searobend) {
@@ -250,7 +250,7 @@ if (m.URL_GN) {
   secondary.push(`<a href="${m.URL_GN}" target="_blank">Electronic Gneuss-Lapidge ${gnId}</a>`);
 }
 if (m.URL_ASMMF) {
-  secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF</a>`);
+  secondary.push(`<a href="${m.URL_ASMMF}" target="_blank">ASMMF${m['ASMMF ID'] ? ` ${m['ASMMF ID']}` : ''}</a>`);
 }
 if (m['Studer-Joho']) {
   secondary.push(`<a href="https://glossenwiki.phil.uni-augsburg.de/wiki/images/StuderAEGG.pdf" target="_blank">Studer-Joho ${m['Studer-Joho']}</a>`);
