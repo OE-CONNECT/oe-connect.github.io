@@ -175,7 +175,11 @@
     const country = document.getElementById('filterCountry').value;
 
     return allManuscripts.filter(m => {
-      if (onlyDigitized && !m.URL_DIGITAL) return false;
+if (
+  onlyDigitized &&
+  !(m.URL_DIGITAL || '').trim() &&
+  !(m['IIIF Manifest'] || '').trim()
+) return false;
 
       const type = (m['Fragment or full'] || '').trim();
       if (type === 'Full MS' && !showFull) return false;
@@ -237,9 +241,15 @@
         ? 'assets/images/icon.fragment.png'
         : 'assets/images/icon.ms.png';
 
-const digital = m.URL_DIGITAL
-  ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : ''}</p>`
-  : `<p><em>No full digital facsimile available</em></p>`;
+const iiifManifest = (m['IIIF Manifest'] || '').trim();
+const digital = iiifManifest
+  ? `<p><a href="msviewer.html?${new URLSearchParams({
+      manifest: iiifManifest,
+      title: m.SHELFMARK || ''
+    })}" target="_blank"><strong>Link to full digital facsimile (IIIF)</strong></a></p>`
+  : m.URL_DIGITAL
+    ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : ''}</p>`
+    : `<p><em>No full digital facsimile available</em></p>`;
 
  const secondary = [];
 if (m['Ker ID'] && m.URL_Searobend) {
