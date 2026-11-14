@@ -14,12 +14,21 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
       .inline-icon {
-        vertical-align: middle;
+          display: inline-block;
+          margin: 0;
+          vertical-align: middle;
       }
+        
       .inline-container {
-        display: flex;
-        gap: 10px;       
-      }  
+          display: inline-flex;
+          align-items: center;
+          gap: 0.35em;
+      }
+
+      .inline-container .inline-icon {
+          display: inline-block;
+          margin: 0;
+      }
       
     </style>
 </head>
