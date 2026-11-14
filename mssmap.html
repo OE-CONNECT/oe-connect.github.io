@@ -12,6 +12,13 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+      .inline-icon {
+        vertical-align: middle;
+        width: 20px;
+        height: auto;
+      }
+    </style>
 </head>
 <body>
 
@@ -40,7 +47,7 @@
       <div class="type-toggles">
         <label>
           <input type="checkbox" id="filterDigitized">
-          Only show fully digitized manuscripts and fragments
+          Only show ful digital facsimiles
         </label>
       </div>
 
@@ -246,9 +253,9 @@ const digital = iiifManifest
   ? `<p><a href="msviewer.html?${new URLSearchParams({
       manifest: iiifManifest,
       title: m.SHELFMARK || ''
-    })}" target="_blank"><strong>→ View full digital facsimile in IIIF viewer</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png"></a>'}</p>`
+    })}" target="_blank"><strong>→ View full digital facsimile in IIIF viewer</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon"</a>'}</p>`
   : m.URL_DIGITAL
-    ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png"></a>'}</p>`
+    ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon"></a>'}</p>`
     : `<p><em>No full digital facsimile available</em></p>`;
 
  const secondary = [];
