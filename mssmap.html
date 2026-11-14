@@ -246,7 +246,7 @@ const digital = iiifManifest
   ? `<p><a href="msviewer.html?${new URLSearchParams({
       manifest: iiifManifest,
       title: m.SHELFMARK || ''
-    })}" target="_blank"><strong>Link to full digital facsimile (IIIF)</strong></a></p>`
+    })}" target="_blank"><strong>View full digital facsimile in IIIF viewer</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: ''}</p>`
   : m.URL_DIGITAL
     ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : ''}</p>`
     : `<p><em>No full digital facsimile available</em></p>`;
@@ -268,7 +268,9 @@ if (m['Studer-Joho']) {
 if (m.OEiS) {
   secondary.push(`<a href="https://doi.org/10.24894/978-3-7965-5205-2" target="_blank"><i>OEiS</i> ${m.OEiS}</a>`);
 }
-
+if (iiifManifest && m.URL_DIGITAL) {
+  secondary.push(`<a href="${m.URL_DIGITAL}" target="_blank">-> Link to alternative portal</a>`);
+}
       html += `
         <div class="ms-card">
           <div class="ms-left">
