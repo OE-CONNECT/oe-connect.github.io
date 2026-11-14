@@ -246,9 +246,9 @@ const digital = iiifManifest
   ? `<p><a href="msviewer.html?${new URLSearchParams({
       manifest: iiifManifest,
       title: m.SHELFMARK || ''
-    })}" target="_blank"><strong>→ View full digital facsimile in IIIF viewer</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png">'}</p>`
+    })}" target="_blank"><strong>→ View full digital facsimile in IIIF viewer</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png"></a>'}</p>`
   : m.URL_DIGITAL
-    ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong></a>${m['LinkDownDate'] ? ` <span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png">'}</p>`
+    ? `<p><a href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png"></a>'}</p>`
     : `<p><em>No full digital facsimile available</em></p>`;
 
  const secondary = [];
