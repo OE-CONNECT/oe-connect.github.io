@@ -28,7 +28,20 @@
   display: none !important;
 }
 
-/* Normal (non-selected) items */
+/* Double-page toggle – active state */
+.tify-header-button[aria-pressed="true"],
+.tify-header-button.-active {
+  background-color: #9c1c2b !important;
+  color: white !important;
+  border-color: #9c1c2b !important;
+}
+
+/* Optional: nicer hover when it’s already active */
+.tify-header-button[aria-pressed="true"]:hover,
+.tify-header-button.-active:hover {
+  background-color: #7a1521 !important;
+}
+    
 .tify-page-select-list > li > a {
   background-color: #f0f0f0 !important;   /* light grey */
   color: #222 !important;                 /* black text */
@@ -90,7 +103,7 @@
 .tify-toc-toggle-all {
   color: inherit !important;
   border-color: currentColor !important;
-  background: none !important;
+  background: #f0f0f0 !important;
 }
 
 .tify-header {
