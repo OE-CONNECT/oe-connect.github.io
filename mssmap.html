@@ -24,7 +24,7 @@
       .inline-container {
           display: inline-flex;
           align-items: center;
-          gap: 20px;
+          gap: 10px;
       }
 
       .inline-container .inline-icon {
@@ -54,7 +54,9 @@
   <li><span style="color: #1A3A6E;"><strong>Studer-Joho</strong></span>: Studer-Joho, D. (2017). <a href="https://doi.org/10.5167/uzh-143088" target="_blank"><i>A Catalogue of Manuscripts Known to Contain Old English Dry-Point Glosses</i></a> (Tübingen: Narr Francke Attempto)</li>
   <li><span style="color: #1A3A6E;"><strong><i>OEiS</i></strong></span>: Seiler, A., & Studer-Joho, N. (Eds.). (2025). <a href="https://doi.org/10.24894/978-3-7965-5205-2" target="_blank"><i>Old English in Switzerland: Manuscripts, Texts and Libraries</i></a> (Basel: Schwabe Verlag)</li>
 </ul>
-      <strong>If you have any corrections or additions to this overview, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.</strong></p>  
+  </p>
+    <p class="inline-container"> Manuscripts and fragments in IIIF Collections can be viewed in our Facsimile Viewer; links to the Facsimile Viewer are marked with the logo <img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon">.</p>
+    <p></p><strong>If you have any corrections or additions to this overview, please <a href="mailto:oe-connect@uj.edu.pl">send us a short e-mail</a>.</strong></p>  
 
     <!-- Filters -->
     <div class="filters-bar">
@@ -66,7 +68,7 @@
       </div>
 
       <div class="type-toggles">
-        <label><input type="checkbox" id="filterFull" checked> Full manuscripts</label>
+        <label><input type="checkbox" id="filterFull" checked> Manuscripts</label>
         <label><input type="checkbox" id="filterFragment" checked> Fragments</label>
       </div>
 
@@ -267,9 +269,9 @@ const digital = iiifManifest
   ? `<p><a class="inline-container" href="msviewer.html?${new URLSearchParams({
       manifest: iiifManifest,
       title: m.SHELFMARK || ''
-    })}" target="_blank"><strong>→ View full digital facsimile in IIIF viewer</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon"</a>'}</p>`
+    })}" target="_blank"><strong>→ View full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>`: '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon"></a>'}</p>`
   : m.URL_DIGITAL
-    ? `<p><a class="inline-container" href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '<img src="https://oe-connect.github.io/assets/images/logo.bibliography.png" class="inline-icon"></a>'}</p>`
+    ? `<p><a class="inline-container" href="${m.URL_DIGITAL}" target="_blank"><strong>Link to full digital facsimile</strong>${m['LinkDownDate'] ? ` </a><span style="color: black;">(Link down since ${m['LinkDownDate']})</span>` : '</a>'}</p>`
     : `<p><em>No full digital facsimile available</em></p>`;
 
  const secondary = [];
