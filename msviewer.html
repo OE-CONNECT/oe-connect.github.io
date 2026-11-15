@@ -23,6 +23,27 @@
   .tify-header-title {
   display: none !important;
 }
+
+/* Normal (non-selected) items */
+.tify-page-select-list > li > a {
+  background-color: #f0f0f0 !important;   /* light grey */
+  color: #222 !important;                 /* black text */
+}
+
+.tify-page-select-list > li > a:hover {
+  background-color: white !important;
+  color: #9c1c2b !important;              /* red text */
+}
+
+.tify-page-select-list > li > a.-current {
+  background-color: #9c1c2b !important;   /* your red */
+  color: white !important;
+}
+
+.tify-page-select-list > li > a.-current:hover {
+  background-color: #7a1521 !important;
+  color: white !important;
+}
     
 .tify a {
   color: #9c1c2b !important;
