@@ -31,7 +31,21 @@
           display: inline-block;
           margin: 0;
       }
-      
+
+  #map:fullscreen {
+  width: 100vw;
+  height: 100vh;
+  }
+
+  .leaflet-control-fullscreen button {
+  display: block;
+  padding: 0 8px;
+  min-height: 30px;
+  border: 0;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+  }
     </style>
 </head>
 <body>
@@ -329,6 +343,47 @@ if (iiifManifest && m.URL_DIGITAL) {
 
     markersLayer = L.layerGroup().addTo(map);
 
+const fullscreenControl = L.control({ position: 'topright' });
+
+fullscreenControl.onAdd = function() {
+  const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-fullscreen');
+  const button = L.DomUtil.create('button', '', container);
+
+  button.type = 'button';
+  button.setAttribute('aria-pressed', 'false');
+
+  function updateButton() {
+    const isFullscreen = document.fullscreenElement === map.getContainer();
+    button.textContent = isFullscreen ? 'Exit fullscreen' : 'Fullscreen';
+    button.setAttribute('aria-pressed', String(isFullscreen));
+  }
+
+  L.DomEvent.disableClickPropagation(container);
+  L.DomEvent.on(button, 'click', async function() {
+    const mapElement = map.getContainer();
+
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await mapElement.requestFullscreen();
+      }
+    } catch (error) {
+      console.error('Could not toggle map fullscreen:', error);
+    }
+  });
+
+  document.addEventListener('fullscreenchange', function() {
+    updateButton();
+    setTimeout(() => map.invalidateSize(), 100);
+  });
+
+  updateButton();
+  return container;
+};
+
+fullscreenControl.addTo(map);
+    
     setTimeout(() => {
       if (map) map.invalidateSize();
     }, 100);
