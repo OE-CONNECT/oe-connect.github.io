@@ -73,6 +73,9 @@
       </div>
     </div>
 
+    <!-- Results title -->
+    <h2 id="resultsTitle"></h2>
+
     <div id="resourcesContainer">
       <p>Loading resources…</p>
     </div>
@@ -133,7 +136,7 @@
         render();
       },
       error: function(err) {
-        document.getElementById('resourcesContainer').innerHTML = '<p>Could not load resources.csv</p>';
+        document.getElementById('resourcesContainer').innerHTML = '<p>Could not load resources.csv</p>'; 
         console.error(err);
       }
     });
@@ -223,6 +226,7 @@
 
     function render() {
       const filtered = getFiltered();
+      updateResultsTitle(filtered);
       updateBadges();
 
       // Group by Category
@@ -261,6 +265,11 @@
       }
 
       document.getElementById('resourcesContainer').innerHTML = html;
+    }
+
+    function updateResultsTitle(filtered) {
+      document.getElementById('resultsTitle').textContent =
+        `Showing ${filtered.length} online Old English resources`;
     }
 
     function updateBadges() {
