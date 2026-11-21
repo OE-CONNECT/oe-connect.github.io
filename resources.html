@@ -90,11 +90,7 @@
 
   <script>
     const CSV_URL = 'assets/data/resources.csv';
-    let allResources = results.data.filter(r =>
-  r.Title &&
-  r.Title.trim() !== '' &&
-  String(r.APPROVED || '').trim().toUpperCase() === 'TRUE'
-);
+    let allResources = [];
 
     // Desired Category order
     const categoryOrder = [
@@ -142,7 +138,11 @@
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
-        allResources = results.data.filter(r => r.Title && r.Title.trim() !== '');
+        allResources = results.data.filter(r =>
+          r.Title &&
+          r.Title.trim() !== '' &&
+          String(r.APPROVED || '').trim().toUpperCase() === 'TRUE'
+        );
         populateFilterOptions();
         render();
       },
@@ -418,8 +418,6 @@
       border: 1px solid #8B1A1A;
       background: #F5E8C7;
       font-family: inherit;
-    }
-
     }
   </style>
 </body>
