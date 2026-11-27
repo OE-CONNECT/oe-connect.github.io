@@ -419,9 +419,9 @@ fullscreenControl.addTo(map);
       const fragmentCount = g.fragment.size;
       const total = fullCount + fragmentCount;
       let color;
-      if (fullCount > 0 && fragmentCount > 0) color = '#8B1A1A';
-      else if (fullCount > 0) color = '#D4AF37';
-      else color = '#1A3A6E';
+      if (total <= 2) color = '#1A3A6E';
+      else if (total <= 6) color = '#8B1A1A';
+      else color = '#D4AF37';
 
       const icon = L.divIcon({
         className: 'custom-marker',
@@ -439,7 +439,10 @@ fullscreenControl.addTo(map);
         iconAnchor: [14, 14]
       });
 
-      const marker = L.marker([g.lat, g.lng], { icon }).addTo(markersLayer);
+      const marker = L.marker([g.lat, g.lng], {
+        icon,
+        zIndexOffset: total * 1000
+      }).addTo(markersLayer);
 
       let popup = `<strong>${g.city}${g.country ? ', ' + g.country : ''}</strong><br>`;
       if (fullCount > 0) popup += `Number of full manuscripts: ${fullCount}<br>`;
