@@ -210,6 +210,7 @@ img {
         grid-row: 1 / span 2;
         margin: 0;
       }
+
     }
 
 /* ===== Manuscripts page styles ===== */
@@ -532,5 +533,17 @@ body.navbar-loaded {
 
   .main-footer {
     padding: 1.5rem 15px;
+  }
+}
+
+/* ========== Mobiel view ========== */
+
+@media (max-width: 768px) {
+  .filters-bar {
+    gap: 0.5rem; /* Reduces flex gap when items wrap vertically */
+  }
+
+  .filter-group {
+    margin-bottom: 0.25rem; /* Greatly reduced bottom margin */
   }
 }
