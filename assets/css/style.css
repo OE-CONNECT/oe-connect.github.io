@@ -490,6 +490,15 @@ img {
   color: var(--color-gold);
 }
 
+.ref-label {
+  color: var(--color-accent);
+  font-weight: bold;
+}
+
+.link-down {
+  color: black;
+}
+
 /* ========== TIFY Facsimile Viewer =========== */
 
 .tify {
