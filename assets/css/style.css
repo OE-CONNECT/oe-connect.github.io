@@ -107,6 +107,14 @@ img {
 
 /* ===== Filter specific styles ===== */
 
+#searchBox {
+  width: 100%;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--color-primary);
+  background: var(--color-bg);
+  font-family: inherit;
+}
+
 .filter-group {
   display: flex;
   flex-direction: column;
@@ -346,12 +354,50 @@ img {
   font-size: 1.05rem;
 }
 
-#searchBox {
-  width: 100%;
-  padding: 0.35rem 0.6rem;
-  border: 1px solid var(--color-primary);
-  background: var(--color-bg);
-  font-family: inherit;
+/* ===== Resources page ===== */
+
+.resource-card {
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.8rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.resource-left {
+  flex-shrink: 0;
+  width: 50px;
+}
+
+.resource-logo {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  display: block;
+}
+
+.resource-right h3 {
+  margin: 0 0 0.4rem 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.resource-description {
+  margin-bottom: 0.5rem;
+}
+
+.resource-link {
+  margin: 0.4rem 0 0.5rem 0;
+}
+
+.resource-link a {
+  font-weight: bold;
+}
+
+.resource-meta {
+  font-size: 0.9rem;
+  color: var(--color-accent);
+  margin: 0;
 }
 
 /* ===== Leaflet map styles ===== */
