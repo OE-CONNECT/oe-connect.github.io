@@ -2,20 +2,20 @@
 
 :root {
   /* Main colours */
-  --color-bg:          #F5E8C7;   /* parchment background */
-  --color-bg-alt:      #f8f1e3;   /* slightly lighter panels */
-  --color-text:        #2C1A0E;   /* dark brown text */
-  --color-text-muted:  #5A4030;   /* secondary text */
-  --color-primary:     #8B1A1A;   /* deep red (main accent) */
-  --color-primary-dark:#5A0F0F;   /* darker red for borders */
-  --color-accent:      #1A3A6E;   /* blue (links on hover, etc.) */
-  --color-gold:        #D4AF37;   /* gold highlights */
-  --color-border:      #d4c4a8;   /* soft borders */
+  --color-bg:          #F5E8C7;   
+  --color-bg-alt:      #f8f1e3;   
+  --color-text:        #2C1A0E;   
+  --color-text-muted:  #5A4030;   
+  --color-primary:     #8B1A1A;   
+  --color-primary-dark:#5A0F0F;   
+  --color-accent:      #1A3A6E;   
+  --color-gold:        #D4AF37;   
+  --color-border:      #d4c4a8;   
 
   /* Layout */
   --max-width:         1200px;
   --nav-max-width:     1160px;
-  --body-top-padding:  200px;     /* space for the fixed navbar */
+  --body-top-padding:  200px;     
 }
 
 
