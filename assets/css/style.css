@@ -68,6 +68,38 @@ img {
   margin-right: auto;
 }
 
+.inline-icon {
+          display: inline-block;
+          margin: 0;
+          height: 30px;
+          width: auto;
+          vertical-align: middle;
+}
+        
+.inline-container {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+ }
+
+ .inline-container .inline-icon {
+          display: inline-block;
+          margin: 0;
+}
+
+/* ===== Filter specific styles ===== */
+
+.filter-group {
+      margin-bottom: 1.5rem;
+    }
+
+.filter-group label {
+      display: block;
+      margin: 0.3rem 0;
+      font-size: 0.95rem;
+      cursor: pointer;
+}
+
 /* ===== Events page specific styles ===== */
 
     .events-layout {
@@ -101,18 +133,6 @@ img {
       color: #8B1A1A;
     }
 
-    .filter-group {
-      margin-bottom: 1.5rem;
-    }
-
-    .filter-group label {
-      display: block;
-      margin: 0.3rem 0;
-      font-size: 0.95rem;
-      cursor: pointer;
-    }
-
-    /* Event card */
     .event-card {
       display: flex;
       gap: 1.5rem;
@@ -179,40 +199,6 @@ img {
       font-size: 1.25rem;
     }
 
-    @media (max-width: 800px) {
-      .events-layout {
-        flex-direction: column;
-      }
-      .events-sidebar {
-        width: 100%;
-        position: static;
-      }
-      .event-card {
-        flex-direction: column;
-      }
-      .event-left {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        grid-template-rows: auto auto;
-        column-gap: 1rem;
-        align-items: center;
-        text-align: left;
-      }
-      .event-year,
-      .event-date {
-        grid-column: 1;
-      }
-      .event-logo {
-        width: auto;
-        max-height: 4rem;
-        grid-column: 2;
-        grid-row: 1 / span 2;
-        margin: 0;
-      }
-
-    }
-
 /* ===== Manuscripts page styles ===== */
 
 body.navbar-loaded {
@@ -272,6 +258,21 @@ body.navbar-loaded {
   border: 2px solid #8B1A1A;
   border-radius: 4px;
 }
+
+#map:fullscreen {
+  width: 100vw;
+  height: 100vh;
+ }
+
+.leaflet-control-fullscreen button {
+  display: block;
+  padding: 0 8px;
+  min-height: 30px;
+  border: 0;
+  background: #fff;
+  color: #222;
+  cursor: pointer;
+ }
 
 #resultsTitle {
   margin-bottom: 1.5rem;
@@ -396,15 +397,109 @@ body.navbar-loaded {
   color: #F5E8C7;
 }
 
-@media (max-width: 700px) {
-  .filter-badges {
-    flex-direction: column;
+
+/* ========== TIFY Facsimile Viewer =========== */
+
+ .tify {
+    --tify-bg-color: #F5E8C7;
+     --tify-body-bg: #f8f1e3;
   }
 
-  .filter-badge {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.tify-main {
+  border-top: none !important;
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.tify-header {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+}
+  .tify-header-title {
+  display: none !important;
+}
+
+/* Double-page toggle – active state */
+.tify-header-button[aria-pressed="true"],
+.tify-header-button.-active {
+  background-color: #9c1c2b !important;
+  color: white !important;
+  border-color: #9c1c2b !important;
+}
+
+/* Optional: nicer hover when it’s already active */
+.tify-header-button[aria-pressed="true"]:hover,
+.tify-header-button.-active:hover {
+  background-color: #7a1521 !important;
+}
+    
+.tify-page-select-list > li > a {
+  background-color: #f0f0f0 !important;   /* light grey */
+  color: #222 !important;                 /* black text */
+}
+
+.tify-page-select-list > li > a:hover {
+  background-color: white !important;
+  color: #9c1c2b !important;              /* red text */
+}
+
+.tify-page-select-list > li > a.-current {
+  background-color: #9c1c2b !important;   /* your red */
+  color: white !important;
+}
+
+.tify-page-select-list > li > a.-current:hover {
+  background-color: #7a1521 !important;
+  color: white !important;
+}
+    
+.tify a {
+  color: #9c1c2b !important;
+}
+
+.tify a:hover {
+  color: #7a1521 !important;
+}
+    
+.tify-media-button,
+.tify-media-dropdown > .tify-dropdown-button {
+  background-color: #9c1c2b !important;
+  color: white !important;
+}
+
+.tify-media-button:hover,
+.tify-media-dropdown > .tify-dropdown-button:hover {
+  background-color: #7a1521 !important;
+}
+
+.tify-media-button:hover {
+  background-color: #7a1521 !important;
+}
+
+.tify-thumbnails-item.-current .tify-thumbnails-button,
+.tify-thumbnails-item.-current {
+  box-shadow: 0 0 0 3px #9c1c2b !important; 
+}
+
+.tify-thumbnails-item.-current .tify-page-name {
+  background-color: #9c1c2b !important;      
+  color: white !important;
+}
+
+.tify-toc {
+  --tify-base-color: #9c1c2b;
+}
+
+.tify-toc-toggle,
+.tify-toc-toggle-all {
+  color: inherit !important;
+  border-color: currentColor !important;
+  background: #f0f0f0 !important;
+}
+
+.tify-header {
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
 /* ========== NAVBAR ========== */
@@ -512,7 +607,10 @@ body.navbar-loaded {
   opacity: 0.9;
 }
 
-@media (max-width: 991.98px) {
+/* ========== Mobile view ========== */
+
+@media (max-width: 768px) {
+
   .main-nav .navbar-nav {
     padding-top: 0.75rem;
   }
@@ -520,10 +618,8 @@ body.navbar-loaded {
   .main-nav .nav-link {
     padding-left: 0;
   }
-}
 
-@media (max-width: 575.98px) {
-  body {
+ body {
     padding-top: 200px;
   }
 
@@ -534,11 +630,16 @@ body.navbar-loaded {
   .main-footer {
     padding: 1.5rem 15px;
   }
-}
 
-/* ========== Mobiel view ========== */
+  .filter-badges {
+    flex-direction: column;
+  }
 
-@media (max-width: 768px) {
+  .filter-badge {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .filters-bar {
     gap: 0.5rem; /* Reduces flex gap when items wrap vertically */
   }
@@ -546,4 +647,40 @@ body.navbar-loaded {
   .filter-group {
     margin-bottom: 0.25rem; /* Greatly reduced bottom margin */
   }
+
+
+ .events-layout {
+   flex-direction: column;
+ }
+ .events-sidebar {
+    width: 100%;
+    position: static;
+  }
+  
+  .event-card {
+    flex-direction: column;
+  }
+  
+  .event-left {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto;
+    column-gap: 1rem;
+    align-items: center;
+    text-align: left;
+   }
+
+  .event-year,
+   .event-date {
+      grid-column: 1;
+   }
+   .event-logo {
+    width: auto;
+    max-height: 4rem;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    margin: 0;
+  }
+
 }
